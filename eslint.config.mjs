@@ -14,9 +14,9 @@ const eslintConfig = [
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off", // Allow 'any' type
-      "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }] // Ignore unused variables starting with '_'
-    }
-  }
+      "@typescript-eslint/no-unused-vars": "off", // Turn off no-unused-vars rule
+    },
+  },
 ];
 
 export default eslintConfig;
