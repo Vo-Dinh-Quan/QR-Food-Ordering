@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMutation } from "@/queries/useAuth";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation(); // cú pháp này có nghĩa là sử dụng hàm useLoginMutation từ file useAuth.tsx
@@ -29,6 +30,7 @@ export default function LoginForm() {
     },
   });
 
+  const router = useRouter();
   // khi nhấn submit thì react hook form sẽ validate cái form bằng zodResolver trước rồi mới validate trên server
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return; // nếu đang loading thì không cho submit nữa
@@ -41,6 +43,7 @@ export default function LoginForm() {
           onClick: () => console.log("Undo"),
         },
       });
+      router.push("/manage/dashboard");
     } catch (error: any) {
       handleErrorApi({
         error,
