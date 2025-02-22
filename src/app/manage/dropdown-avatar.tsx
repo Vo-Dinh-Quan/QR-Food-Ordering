@@ -18,7 +18,7 @@ import { useAccountProfile } from "@/queries/useAccount";
 export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const router = useRouter();
-  const { data } = useAccountProfile((res) => {});
+  const { data } = useAccountProfile();
   const account = data?.payload.data;
   const logout = async () => {
     if (logoutMutation.isPending) return;
