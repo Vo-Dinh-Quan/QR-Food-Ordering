@@ -30,8 +30,8 @@ export const handleErrorApi = ({
     toast("Lỗi", {
       description: error?.payload?.message ?? "Lỗi không xác định",
       action: {
-        label: "Undo",
-        onClick: () => console.log("Undo"),
+        label: "Ẩn",
+        onClick: () => console.log("Lỗi"),
       },
       duration: duration ?? 5000,
     });
