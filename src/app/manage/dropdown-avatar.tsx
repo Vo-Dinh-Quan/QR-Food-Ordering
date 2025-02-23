@@ -13,12 +13,12 @@ import Link from "next/link";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { handleErrorApi } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useAccountProfile } from "@/queries/useAccount";
+import { useAccountMe } from "@/queries/useAccount";
 
 export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const router = useRouter();
-  const { data } = useAccountProfile();
+  const { data } = useAccountMe();
   const account = data?.payload.data;
   const logout = async () => {
     if (logoutMutation.isPending) return;
@@ -38,7 +38,11 @@ export default function DropdownAvatar() {
           size="icon"
           className="overflow-hidden rounded-full">
           <Avatar>
-            <AvatarImage className="object-cover" src={account?.avatar ?? undefined} alt={account?.name} />
+            <AvatarImage
+              className="object-cover"
+              src={account?.avatar ?? undefined}
+              alt={account?.name}
+            />
             <AvatarFallback>
               {account?.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
