@@ -38,7 +38,7 @@ export default function DropdownAvatar() {
           size="icon"
           className="overflow-hidden rounded-full">
           <Avatar>
-            <AvatarImage src={account?.avatar ?? undefined} alt={account?.name} />
+            <AvatarImage className="object-cover" src={account?.avatar ?? undefined} alt={account?.name} />
             <AvatarFallback>
               {account?.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>

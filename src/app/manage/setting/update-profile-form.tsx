@@ -1,50 +1,93 @@
-'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Upload } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.schema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+"use client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Upload } from "lucide-react";
+import { useForm } from "react-hook-form";
+import {
+  UpdateMeBody,
+  UpdateMeBodyType,
+} from "@/schemaValidations/account.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useAccountProfile } from "@/queries/useAccount";
 
 export default function UpdateProfileForm() {
+  const [file, setFile] = useState<File | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const { data } = useAccountProfile();
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
-      name: '',
-      avatar: ''
+      name: "",
+      avatar: "",
+    },
+  });
+  const avatar = form.watch("avatar");
+  const name = form.watch("name");
+
+  useEffect(() => {
+    if (data) {
+      const { name, avatar } = data?.payload.data;
+      form.setValue("name", name);
+      form.setValue("avatar", avatar || "");
     }
-  })
+  }, [data, form]);
+
+  const previewAvatar = useMemo(() => {
+    // useMemo giúp ghi nhớ giá trị trả về của hàm callback và chỉ tính toán lại khi một trong các dependencies thay đổi
+    if (file) { //  Nếu như chưa up file thì sẽ lấy trong avatar được get về
+      return URL.createObjectURL(file);
+    }
+    return avatar;
+  }, [file, avatar]);
+  console.log(previewAvatar);
 
   return (
     <Form {...form}>
-      <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
-        <Card x-chunk='dashboard-07-chunk-0'>
+      <form
+        noValidate
+        className="grid auto-rows-max items-start gap-4 md:gap-8">
+        <Card x-chunk="dashboard-07-chunk-0">
           <CardHeader>
             <CardTitle>Thông tin cá nhân</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='grid gap-6'>
+            <div className="grid gap-6">
               <FormField
                 control={form.control}
-                name='avatar'
+                name="avatar"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='flex gap-2 items-start justify-start'>
-                      <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
-                        <AvatarImage src={'Duoc'} />
-                        <AvatarFallback className='rounded-none'>{'duoc'}</AvatarFallback>
+                    <div className="flex gap-2 items-start justify-start">
+                      <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
+                        <AvatarImage className="object-cover" src={previewAvatar} />
+                        <AvatarFallback className="rounded-none">
+                          {name}
+                        </AvatarFallback>
                       </Avatar>
-                      <input type='file' accept='image/*' className='hidden' />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={avatarInputRef}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFile(file);
+                          }
+                        }}
+                      />
                       <button
-                        className='flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed'
-                        type='button'
-                      >
-                        <Upload className='h-4 w-4 text-muted-foreground' />
-                        <span className='sr-only'>Upload</span>
+                        className="flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed"
+                        type="button"
+                        onClick={() => avatarInputRef.current?.click()}>
+                        <Upload className="h-4 w-4 text-muted-foreground" />
+                        <span className="sr-only">Upload</span>
                       </button>
                     </div>
                   </FormItem>
@@ -53,23 +96,28 @@ export default function UpdateProfileForm() {
 
               <FormField
                 control={form.control}
-                name='name'
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid gap-3'>
-                      <Label htmlFor='name'>Tên</Label>
-                      <Input id='name' type='text' className='w-full' {...field} />
+                    <div className="grid gap-3">
+                      <Label htmlFor="name">Tên</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
                 )}
               />
 
-              <div className=' items-center gap-2 md:ml-auto flex'>
-                <Button variant='outline' size='sm' type='reset'>
+              <div className=" items-center gap-2 md:ml-auto flex">
+                <Button variant="outline" size="sm" type="reset">
                   Hủy
                 </Button>
-                <Button size='sm' type='submit'>
+                <Button size="sm" type="submit">
                   Lưu thông tin
                 </Button>
               </div>
@@ -78,5 +126,5 @@ export default function UpdateProfileForm() {
         </Card>
       </form>
     </Form>
-  )
+  );
 }
