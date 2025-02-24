@@ -167,7 +167,6 @@ const request = async <Response>(
     } else if (normalizeUrl === "api/auth/logout") {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
-      localStorage.removeItem("refreshToken");
     }
   }
   return data;

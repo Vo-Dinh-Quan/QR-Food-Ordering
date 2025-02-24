@@ -7,18 +7,32 @@ const unAuthPaths = ["/login", "/register"];
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log("pathname", pathname);
-  const isAuth = Boolean(request.cookies.get("accessToken")?.value);
-  if (privatePaths.some((path) => pathname.startsWith(path)) && !isAuth) {
-    // nếu mà path hiện tại nằm trong privatePaths và không có accessToken thì chuyển hướng về trang login
+  // sử dụng cả accessToken và refreshToken để check trạng thái. (vì có trường hợp accessToken hết hạn, vì vậy chúng ta sẽ check đăng nhập thông qua refreshToken)
+  const accessToken = request.cookies.get("accessToken")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
+
+  // Chưa đăng nhập thì không cho vào privatePaths
+  if (privatePaths.some((path) => pathname.startsWith(path)) && !refreshToken) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  if (unAuthPaths.some((path) => pathname.startsWith(path)) && isAuth) {
-    // nếu mà path hiện tại nằm trong unAuthPaths và có accessToken thì chuyển hướng về trang home
+
+  // đăng nhập rồi mà cố tình vào trang login thì sẽ chuyển hướng về trang chính
+  if (unAuthPaths.some((path) => pathname.startsWith(path)) && refreshToken) {
     return NextResponse.redirect(new URL("/", request.url));
   }
+
+  // Trường hợp đăng nhập rồi nhưng accessToken hết hạn và truy cập vào các page là privatePaths(note: cố tình check trường hợp này cuối cùng)
+  if (
+    privatePaths.some((path) => pathname.startsWith(path)) &&
+    !accessToken &&
+    refreshToken
+  ) {
+    const url = new URL("/logout", request.url);
+    url.searchParams.set("refreshToken", refreshToken || "");
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
-  // return NextResponse.redirect(new URL("/home", request.url));
 }
 
 // See "Matching Paths" below to learn more
