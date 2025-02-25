@@ -3,6 +3,8 @@ import {
   LoginBodyType,
   LoginResType,
   LogoutBodyType,
+  RefreshTokenBodyType,
+  RefreshTokenResType,
 } from "@/schemaValidations/auth.schema";
 
 const authApiRequest = {
@@ -28,6 +30,12 @@ const authApiRequest = {
   // client gọi đến route handler, không cần truyền AT và RT vào body vì nó đã tự động gửi thông qua cookie rồi
   cLogout: () =>
     http.post("/api/auth/logout", null, {
+      baseUrl: "",
+    }),
+  sRefreshToken: (body: RefreshTokenBodyType) =>
+    http.post<RefreshTokenResType>("auth/refresh-token", body),
+  cRefreshToken: () =>
+    http.post<RefreshTokenResType>("/api/auth/refresh-token", null, {
       baseUrl: "",
     }),
 };
