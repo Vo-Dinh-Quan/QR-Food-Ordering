@@ -1,5 +1,8 @@
 "use client";
-import { getRefreshTokenToLocalStorage } from "@/lib/utils";
+import {
+  getAccessTokenFromLocalStorage,
+  getRefreshTokenToLocalStorage,
+} from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef } from "react";
@@ -7,13 +10,21 @@ import React, { useEffect, useRef } from "react";
 export default function LogoutPage() {
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get("refreshToken");
+  const accessTokenFromUrl = searchParams.get("accessToken");
+
   const { mutateAsync } = useLogoutMutation();
   const router = useRouter();
 
   const ref = useRef<any>(null);
   useEffect(() => {
     // ngoài dùng useRef để xử lý useEffect render 2 lần thì dùng refreshToken để xử lý khi vào url logout trực tiếp sẽ bị logout (troll vn)
-    if (ref.current || refreshTokenFromUrl !== getRefreshTokenToLocalStorage())
+    if (
+      ref.current ||
+      (refreshTokenFromUrl &&
+        refreshTokenFromUrl !== getRefreshTokenToLocalStorage()) ||
+      (accessTokenFromUrl &&
+        accessTokenFromUrl !== getAccessTokenFromLocalStorage())
+    )
       return;
     ref.current = mutateAsync;
     mutateAsync().then((res) => {
@@ -22,7 +33,7 @@ export default function LogoutPage() {
       }, 1000);
       router.push("/login");
     });
-  }, [mutateAsync, router, refreshTokenFromUrl]);
+  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl]);
   return <div>Logout ... </div>;
 }
 // đã tạm dừng ở phút 12:20
