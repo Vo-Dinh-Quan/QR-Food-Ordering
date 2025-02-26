@@ -51,5 +51,10 @@ export const decodeJWT = <Payload = any>(token: string) => {
 const isBrowser = typeof window !== "undefined"; // thằng này được sử dụng trong nav-items.tsx, kiểm tra trước vì nav-items.tsx với use client nó sẽ chạy ở 2 môi trường, 1 là lúc build, 2 là lúc chạy ở browser, nên nó sẽ bị lỗi localStorage is not defined
 export const getAccessTokenFromLocalStorage = () =>
   isBrowser ? localStorage.getItem("accessToken") : null;
-export const getRefreshTokenToLocalStorage = () =>
+export const getRefreshTokenFromLocalStorage = () =>
   isBrowser ? localStorage.getItem("refreshToken") : null;
+
+export const setAccessTokenToLocalStorage = (accessToken: string) =>
+  isBrowser ? localStorage.setItem("accessToken", accessToken) : null;
+export const setRefreshTokenToLocalStorage = (refreshToken: string) =>
+  isBrowser ? localStorage.setItem("refreshToken", refreshToken) : null;

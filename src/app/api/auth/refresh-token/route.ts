@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const decodeAccessToken = jwt.decode(payload.data.accessToken) as {
       exp: number;
     };
-    console.log("decodeAccessToken", decodeAccessToken);
+    // console.log("decodeAccessToken", decodeAccessToken);
     const decodeRefreshToken = jwt.decode(payload.data.refreshToken) as {
       exp: number;
     };

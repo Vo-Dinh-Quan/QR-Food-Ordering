@@ -12,7 +12,6 @@ export async function POST(request: Request) {
     const { accessToken, refreshToken } = payload.data;
 
     const decodeAccessToken = jwt.decode(accessToken) as { exp: number };
-    console.log("decodeAccessToken", decodeAccessToken);
     const decodeRefreshToken = jwt.decode(refreshToken) as { exp: number };
 
     cookieStore.set("accessToken", accessToken, {
