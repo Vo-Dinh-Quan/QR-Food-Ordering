@@ -36,6 +36,5 @@ export default function LogoutPage() {
   }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl]);
   return <div>Logout ... </div>;
 }
-// đã tạm dừng ở phút 12:20
 
 // khi ta sử dụng const logoutMutation = useLogoutMutation(); và gọi logoutMutation.mutateAsync(). object logoutMutation sẽ bị thay đổi tham chiếu mỗi khi ta gọi mutateAsync, dẫn đến dependency của useEffect thay đổi, => vòng lặp vô hạn

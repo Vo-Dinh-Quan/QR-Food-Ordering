@@ -4,6 +4,7 @@ import { type ClassValue, clsx } from "clsx";
 import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import jwt from "jsonwebtoken";
+import authApiRequest from "@/apiRequests/auth";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -58,3 +59,46 @@ export const setAccessTokenToLocalStorage = (accessToken: string) =>
   isBrowser ? localStorage.setItem("accessToken", accessToken) : null;
 export const setRefreshTokenToLocalStorage = (refreshToken: string) =>
   isBrowser ? localStorage.setItem("refreshToken", refreshToken) : null;
+
+export const checkAndRefreshToken = async (params?: { // params là một object có thể có hoặc không có, nếu có thì nó sẽ có 2 key là onError và onSuccess và cả 2 đều là function
+  onError?: () => void;
+  onSuccess?: () => void;
+}) => {
+  // không nên đưa logic lấy access, refresh token ra khỏi func checkAndRefresh
+  // vì để mỗi lần checkAndRefreshToken chạy thì nó sẽ fetch lại cho chúng ta cặp token mới
+  // tránh hiện tượng bug nó lấy token cũ ở lần đầu rồi gọi cho các lần tiếp theo
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
+  // chưa đăng nhập thì củng không cho chạy
+  if (!accessToken || !refreshToken) return;
+  const decodedAccessToken = jwt.decode(accessToken) as {
+    exp: number; // thời điểm hết hạn của token (đơn vị: s)
+    iat: number; // thời điểm tạo token (đơn vị: s)
+  };
+  const decodedRefreshToken = jwt.decode(refreshToken) as {
+    exp: number; // thời điểm hết hạn của token (đơn vị: s)
+    iat: number; // thời điểm tạo token (đơn vị: s)
+  };
+  // thời điểm hết hạn của token được tính theo epoch time (s)
+  // còn khi dùng cú pháp new Date().getTime() thì nó trả về epoch time (ms)
+  const now = Math.round(new Date().getTime() / 1000);
+  // trường hợp refresh token hết hạn thì không xử lý nữa
+  if (decodedRefreshToken.exp <= now) return; // nếu số giây ở thời điểm hiện tại lớn hơn số giây ở thời điểm hết hạn của token thì token đã hết hạn
+  // ví dụ access token hết hạn 10 phút thì mình sẽ kiểm tra 1/3 thời gian (3p) thì mình sẽ cho refresh token lại.
+  // thời gian còn lại sẽ tính dựa trên công thức: decodedAccessToken.exp - now
+  // thời gian hết hạn của access token dựa trên công thức: decodedAccessToken.exp - decodedAccessToken.iat
+  if (
+    decodedAccessToken.exp - now <
+    (decodedAccessToken.exp - decodedAccessToken.iat) / 3
+  ) {
+    // gọi API refresh token
+    try {
+      const response = await authApiRequest.cRefreshToken();
+      setAccessTokenToLocalStorage(response.payload.data.accessToken);
+      setRefreshTokenToLocalStorage(response.payload.data.refreshToken);
+      if (params?.onSuccess) params.onSuccess();
+    } catch (error) {
+      if (params?.onError) params.onError();
+    }
+  }
+};
