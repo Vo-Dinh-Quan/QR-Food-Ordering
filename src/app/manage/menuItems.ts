@@ -1,43 +1,50 @@
-import { HobbyKnifeIcon, PinLeftIcon } from '@radix-ui/react-icons'
-import { Home, LineChart, ShoppingCart, Users2, Salad, Table } from 'lucide-react'
+import {
+  Home,
+  LineChart,
+  ShoppingCart,
+  Users2,
+  Salad,
+  Table,
+  LayoutGrid,
+} from "lucide-react";
 
 const menuItems = [
   {
-    title: 'Trang chủ',
-    Icon: PinLeftIcon,
-    href: '/'
+    title: "Trang chủ",
+    Icon: LayoutGrid,
+    href: "/",
   },
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     Icon: Home,
-    href: '/manage/dashboard'
+    href: "/manage/dashboard",
   },
   {
-    title: 'Đơn hàng',
+    title: "Đơn hàng",
     Icon: ShoppingCart,
-    href: '/manage/orders'
+    href: "/manage/orders",
   },
   {
-    title: 'Bàn ăn',
+    title: "Bàn ăn",
     Icon: Table,
-    href: '/manage/tables'
+    href: "/manage/tables",
   },
   {
-    title: 'Món ăn',
+    title: "Món ăn",
     Icon: Salad,
-    href: '/manage/dishes'
+    href: "/manage/dishes",
   },
 
   {
-    title: 'Phân tích',
+    title: "Phân tích",
     Icon: LineChart,
-    href: '/manage/analytics'
+    href: "/manage/analytics",
   },
   {
-    title: 'Nhân viên',
+    title: "Nhân viên",
     Icon: Users2,
-    href: '/manage/accounts'
-  }
-]
+    href: "/manage/accounts",
+  },
+];
 
-export default menuItems
+export default menuItems;
