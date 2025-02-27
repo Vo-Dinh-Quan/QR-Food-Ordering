@@ -14,7 +14,7 @@ export const handleErrorApi = ({
   error,
   setError,
   duration,
-}: {
+} : {
   error: any;
   setError?: UseFormSetError<any>;
   duration?: number;
@@ -87,9 +87,11 @@ export const checkAndRefreshToken = async (params?: {
   };
   // thời điểm hết hạn của token được tính theo epoch time (s)
   // còn khi dùng cú pháp new Date().getTime() thì nó trả về epoch time (ms)
-  const now = Math.round(new Date().getTime() / 1000);
+
+  // bug ở đây có 2 vấn đề, 1 là làm tròn lên dẫn đến hết hạn sớm hơn. 2 là cookie đổi sang ms nó cao hơn vài trăm ms so với epoch time trong localStorage. dẫn đến middleware check có token nên => /home thay vì /login
+  const now = (new Date().getTime() / 1000) - 1; // không làm tròn chỗ này (-1s trừ hao do trong cookie hết hạn trễ hơn localStorage vài trăm ms)
   // trường hợp refresh token hết hạn thì không xử lý nữa
-  if (decodedRefreshToken.exp <= now) {
+  if (now >= decodedRefreshToken.exp) {
     removeTokensFromLocalStorage();
     if (params?.onError) return params.onError();
   } // nếu số giây ở thời điểm hiện tại lớn hơn số giây ở thời điểm hết hạn của token thì token đã hết hạn
@@ -102,7 +104,7 @@ export const checkAndRefreshToken = async (params?: {
   ) {
     // gọi API refresh token
     try {
-      const response = await authApiRequest.cRefreshToken();
+      const response = await authApiRequest.cRefreshToken(); // nếu thực chất refresh token nó vừa mới hết hạn rồi nhưng ta cố tình trừ now đi 1s thì tính là chưa hết hạn, xuống dưới đây gọi api thì nó check đã hết hạn rồi thì sẽ đc tự logout thôi
       setAccessTokenToLocalStorage(response.payload.data.accessToken);
       setRefreshTokenToLocalStorage(response.payload.data.refreshToken);
       if (params?.onSuccess) params.onSuccess();

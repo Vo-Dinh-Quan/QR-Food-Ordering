@@ -1,13 +1,14 @@
 "use client";
+
+import React, { Suspense, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useLogoutMutation } from "@/queries/useAuth";
 import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
 } from "@/lib/utils";
-import { useLogoutMutation } from "@/queries/useAuth";
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useRef } from "react";
 
-export default function LogoutPage() {
+function LogoutContent() {
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get("refreshToken");
   const accessTokenFromUrl = searchParams.get("accessToken");
@@ -27,7 +28,7 @@ export default function LogoutPage() {
     )
       return;
     ref.current = mutateAsync;
-    mutateAsync().then((res) => {
+    mutateAsync().then(() => {
       setTimeout(() => {
         ref.current = null;
       }, 1000);
@@ -36,5 +37,14 @@ export default function LogoutPage() {
   }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl]);
   return <div>Logout ... </div>;
 }
+
+export default function LogoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LogoutContent />
+    </Suspense>
+  );
+}
+
 
 // khi ta sử dụng const logoutMutation = useLogoutMutation(); và gọi logoutMutation.mutateAsync(). object logoutMutation sẽ bị thay đổi tham chiếu mỗi khi ta gọi mutateAsync, dẫn đến dependency của useEffect thay đổi, => vòng lặp vô hạn
