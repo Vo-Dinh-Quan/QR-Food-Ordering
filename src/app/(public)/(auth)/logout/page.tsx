@@ -7,12 +7,13 @@ import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
 } from "@/lib/utils";
+import { useAppContext } from "@/components/app-provider";
 
 function LogoutContent() {
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get("refreshToken");
   const accessTokenFromUrl = searchParams.get("accessToken");
-
+  const {setIsAuth} = useAppContext();
   const { mutateAsync } = useLogoutMutation();
   const router = useRouter();
 
@@ -20,21 +21,24 @@ function LogoutContent() {
   useEffect(() => {
     // ngoài dùng useRef để xử lý useEffect render 2 lần thì dùng refreshToken để xử lý khi vào url logout trực tiếp sẽ bị logout (troll vn)
     if (
-      ref.current ||
-      (refreshTokenFromUrl &&
-        refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()) ||
+      !ref.current &&
+      ((refreshTokenFromUrl &&
+        refreshTokenFromUrl === getRefreshTokenFromLocalStorage()) ||
       (accessTokenFromUrl &&
-        accessTokenFromUrl !== getAccessTokenFromLocalStorage())
-    )
-      return;
-    ref.current = mutateAsync;
-    mutateAsync().then(() => {
-      setTimeout(() => {
-        ref.current = null;
-      }, 1000);
+        accessTokenFromUrl === getAccessTokenFromLocalStorage()))
+    ) {
+      ref.current = mutateAsync;
+      mutateAsync().then(() => {
+        setTimeout(() => {
+          ref.current = null;
+        }, 1000);
+        setIsAuth(false);
+        router.push("/login");
+      });
+    }else {
       router.push("/login");
-    });
-  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl]);
+    }
+  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setIsAuth]);
   return <div>Logout ... </div>;
 }
 

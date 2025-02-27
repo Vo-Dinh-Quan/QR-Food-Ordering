@@ -25,6 +25,8 @@ function RefreshTokenContent() {
           router.push(redirectPathname || "/");
         },
       });
+    }else {
+      router.push("/login");
     }
   }, [router, refreshTokenFromUrl, redirectPathname]);
   return <div>Refresh Token Page ...</div>;

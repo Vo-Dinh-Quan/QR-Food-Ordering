@@ -14,11 +14,13 @@ import { useLogoutMutation } from "@/queries/useAuth";
 import { handleErrorApi } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useAccountMe } from "@/queries/useAccount";
+import { useAppContext } from "@/components/app-provider";
 
 export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const router = useRouter();
   const { data } = useAccountMe();
+  const {setIsAuth} = useAppContext();
   const account = data?.payload.data;
   const logout = async () => {
     if (logoutMutation.isPending) return;
@@ -26,6 +28,7 @@ export default function DropdownAvatar() {
       await logoutMutation.mutateAsync();
       // sau phần này, trong http.ts nó sẽ có phần xóa localStorage cho mình rồi
       router.push("/");
+      setIsAuth(false);
     } catch (error: any) {
       handleErrorApi({ error });
     }

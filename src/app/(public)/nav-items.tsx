@@ -1,6 +1,7 @@
 // giải thích 1 chút là: thằng nav-item này được import vào layout public nên những page nào nằm trong thư mục public thì đều bị ảnh hưởng chuyển sang dynamic-rendering khi nav-item có sử dụng cookie từ next/headers, vậy nên chúng ta sẽ chuyển nó sang 'useClient' để dùng localStorage thay vì cookie
 "use client";
 
+import { useAppContext } from "@/components/app-provider";
 import { getAccessTokenFromLocalStorage } from "@/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -50,10 +51,7 @@ It can also happen if the client has a browser extension installed which messes 
 // hướng giải quyết: sử dụng useEffect để check trạng thái đăng nhập của user (theo gợi ý của nextjs)
 // cách này sẽ giúp tránh lỗi hydration failed và warning Content did not match
 export default function NavItems({ className }: { className?: string }) {
-  const [isAuth, setIsAuth] = useState(false);
-  useEffect(() => {
-    setIsAuth(Boolean(getAccessTokenFromLocalStorage()));
-  }, []);
+  const { isAuth } = useAppContext();
   return menuItems.map((item) => {
     if (
       (item.authRequired === false && isAuth) || // chưa đăng nhập thì mới hiển thị mà lại đã đăng nhập thì không hiển thị

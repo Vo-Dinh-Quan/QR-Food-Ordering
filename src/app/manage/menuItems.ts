@@ -1,6 +1,12 @@
+import { HobbyKnifeIcon, PinLeftIcon } from '@radix-ui/react-icons'
 import { Home, LineChart, ShoppingCart, Users2, Salad, Table } from 'lucide-react'
 
 const menuItems = [
+  {
+    title: 'Trang chủ',
+    Icon: PinLeftIcon,
+    href: '/'
+  },
   {
     title: 'Dashboard',
     Icon: Home,
