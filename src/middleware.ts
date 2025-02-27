@@ -13,7 +13,9 @@ export function middleware(request: NextRequest) {
 
   // Chưa đăng nhập thì không cho vào privatePaths
   if (privatePaths.some((path) => pathname.startsWith(path)) && !refreshToken) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    const url = new URL("/login", request.url);
+    url.searchParams.set("clearTokens", "true");
+    return NextResponse.redirect(url);
   }
 
   // đăng nhập rồi mà cố tình vào trang login thì sẽ chuyển hướng về trang chính

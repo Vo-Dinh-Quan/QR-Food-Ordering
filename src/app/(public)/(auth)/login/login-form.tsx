@@ -15,11 +15,15 @@ import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMutation } from "@/queries/useAuth";
 import { toast } from "sonner";
-import { handleErrorApi } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { handleErrorApi, removeTokensFromLocalStorage } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useAppContext } from "@/components/app-provider";
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation(); // cú pháp này có nghĩa là sử dụng hàm useLoginMutation từ file useAuth.tsx
+  const searchParams = useSearchParams();
+  const clearTokens = searchParams.get("clearTokens");
   // cấu hình form sử dụng react-hook-form và zodResolver để validate form
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody), // react-hook-form sử dụng zodResolver để validate dữ liệu dựa trên LoginBoy.
@@ -32,6 +36,15 @@ export default function LoginForm() {
 
   const router = useRouter();
   // khi nhấn submit thì react hook form sẽ validate cái form bằng zodResolver trước rồi mới validate trên server
+  const { setIsAuth } = useAppContext();
+
+  useEffect(() => {
+    console.log("clearTokens", clearTokens);
+    if (clearTokens) {
+      setIsAuth(false);
+    }
+  }, [clearTokens, setIsAuth]);
+
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return; // nếu đang loading thì không cho submit nữa
     try {

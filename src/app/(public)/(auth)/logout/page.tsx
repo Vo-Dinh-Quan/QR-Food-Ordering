@@ -20,20 +20,22 @@ function LogoutContent() {
   useEffect(() => {
     // ngoài dùng useRef để xử lý useEffect render 2 lần thì dùng refreshToken để xử lý khi vào url logout trực tiếp sẽ bị logout (troll vn)
     if (
-      ref.current ||
-      (refreshTokenFromUrl &&
-        refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()) ||
+      !ref.current &&
+      ((refreshTokenFromUrl &&
+        refreshTokenFromUrl === getRefreshTokenFromLocalStorage()) ||
       (accessTokenFromUrl &&
-        accessTokenFromUrl !== getAccessTokenFromLocalStorage())
-    )
-      return;
-    ref.current = mutateAsync;
-    mutateAsync().then(() => {
-      setTimeout(() => {
-        ref.current = null;
-      }, 1000);
+        accessTokenFromUrl === getAccessTokenFromLocalStorage()))
+    ) {
+      ref.current = mutateAsync;
+      mutateAsync().then(() => {
+        setTimeout(() => {
+          ref.current = null;
+        }, 1000);
+        router.push("/login");
+      });
+    }else {
       router.push("/login");
-    });
+    }
   }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl]);
   return <div>Logout ... </div>;
 }
