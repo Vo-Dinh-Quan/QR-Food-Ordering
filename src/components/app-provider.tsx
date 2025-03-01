@@ -20,7 +20,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const AppConText = createContext({
+const AppConText = createContext({ // createContext tạo ra một context mới, giá trị mặc định của context này là { isAuth: false, setIsAuth: (isAuth: boolean) => {} }
   isAuth: false,
   setIsAuth: (isAuth: boolean) => {},
 });
@@ -35,14 +35,13 @@ export default function AppProvider({
   children: React.ReactNode;
 }) {
   const [isAuth, setIsAuthState] = useState(false);
-  useEffect(() => {
+  useEffect(() => { // chạy useEffect lần đầu để check access token   
     const accessToken = getAccessTokenFromLocalStorage();
     if (accessToken) {
       setIsAuthState(true);
     }
   },[])
 
-  // 
   const setIsAuth = (isAuth: boolean) => {
     if (isAuth) {
       setIsAuthState(true);
@@ -53,7 +52,6 @@ export default function AppProvider({
   };
   return (
     <AppConText value={{ isAuth, setIsAuth }}>
-      {" "}
       <QueryClientProvider client={queryClient}>
         <RefreshToken />
         {children}
