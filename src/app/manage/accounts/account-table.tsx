@@ -49,6 +49,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation' // Hook lấy query params từ URL của Next.js
 import AutoPagination from '@/components/auto-pagination' // Component tự động phân trang
+import { useGetAccountList } from '@/queries/useAccount'
 
 // Định nghĩa kiểu dữ liệu cho một item tài khoản, dựa theo dữ liệu trả về từ API
 type AccountItem = AccountListResType['data'][0]
@@ -72,6 +73,11 @@ const AccountTableContext = createContext<{
 // Định nghĩa các cột của bảng sử dụng thư viện @tanstack/react-table
 export const columns: ColumnDef<AccountType>[] = [
   {
+    id: 'stt',
+    header: 'STT',
+    cell: ({ row }) => <div>{row.index + 1}</div>
+  },
+  {
     accessorKey: 'id', // Lấy dữ liệu từ thuộc tính 'id' của đối tượng Account
     header: 'ID' // Tiêu đề cột
   },
@@ -82,7 +88,7 @@ export const columns: ColumnDef<AccountType>[] = [
       <div>
         {/* Sử dụng component Avatar để hiển thị ảnh đại diện */}
         <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
-          <AvatarImage src={row.getValue('avatar')} />
+          <AvatarImage src={row.getValue('avatar')} className='object-cover'/>
           {/* Nếu không load được ảnh, hiển thị fallback là tên của nhân viên */}
           <AvatarFallback className='rounded-none'>{row.original.name}</AvatarFallback>
         </Avatar>
@@ -105,7 +111,6 @@ export const columns: ColumnDef<AccountType>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className='lowercase'>{row.getValue('email')}</div>
   },
   {
     id: 'actions', // Cột hành động không dựa trên dữ liệu cụ thể trong đối tượng Account
@@ -182,7 +187,7 @@ function AlertDialogDeleteAccount({
 }
 
 // Số lượng item hiển thị trên 1 trang (cho phân trang)
-const PAGE_SIZE = 10
+const PAGE_SIZE = 5
 
 // Component chính hiển thị bảng tài khoản
 export default function AccountTable() {
@@ -196,7 +201,9 @@ export default function AccountTable() {
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
   // Data hiển thị bảng, hiện tại đang rỗng, có thể được thay thế bằng dữ liệu fetch từ API
-  const data: any[] = []
+
+  const accountListQuery = useGetAccountList();
+  const data = accountListQuery.data?.payload.data ?? [];
 
   // Các state quản lý trạng thái sắp xếp, lọc cột, ẩn hiện cột và lựa chọn dòng
   const [sorting, setSorting] = useState<SortingState>([])

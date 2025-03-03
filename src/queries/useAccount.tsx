@@ -31,10 +31,11 @@ export const useGetAccountList = () => {
   });
 };
 
-export const useGetAccount = ({ id }: { id: number }) => {
+export const useGetAccount = ({ id, enable }: { id: number, enable: boolean }) => {
   return useQuery({
     queryKey: ["account", id],
     queryFn: () => accountApiRequest.getEmployee(id),
+    enabled: enable
   });
 };
 
@@ -57,9 +58,14 @@ export const useUpdateAccountMutation = () => {
     // cú pháp {id,...body} để lấy ra id và còn lại là body
     mutationFn: ({id,...body}: UpdateEmployeeAccountBodyType & { id: number }) =>
       accountApiRequest.updateEmployee(id, body),
-    onSuccess: () => {
+    onSuccess: (_, { id }) => {
+      // _ là kết quả của mutationFn, không sử dụng trong trường hợp này
+      // { id } là đối tượng chứa các tham số mà bạn đã truyền vào mutationFn
       queryClient.invalidateQueries({
         queryKey: ["accounts"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["account", id],
       });
     },
   });
