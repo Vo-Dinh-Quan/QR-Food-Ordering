@@ -5,11 +5,30 @@ import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import jwt from "jsonwebtoken";
 import authApiRequest from "@/apiRequests/auth";
+import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
+import envConfig from "@/config";
 
+/**
+ * Hàm cn:
+ * - Kết hợp các class CSS thông qua clsx và sau đó hợp nhất chúng bằng twMerge để đảm bảo không có class trùng lặp.
+ *
+ * @param inputs Danh sách các giá trị class (có thể là chuỗi, mảng, đối tượng) 
+ * @returns Một chuỗi class CSS đã được gộp lại.
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Hàm handleErrorApi:
+ * - Xử lý lỗi trả về từ API và hiển thị lỗi thông qua toast hoặc gán lỗi cho form.
+ * - Nếu lỗi thuộc loại EntityError và có setError từ react-hook-form, sẽ lặp qua từng lỗi và gọi setError để hiển thị lỗi bên trong form.
+ * - Nếu không, sẽ hiển thị thông báo toast với thông tin lỗi.
+ *
+ * @param error Lỗi trả về từ API (có thể là bất kỳ kiểu nào)
+ * @param setError (Tùy chọn) Hàm dùng để gán lỗi cho các trường của form.
+ * @param duration (Tùy chọn) Thời gian hiển thị thông báo toast, mặc định là 5000ms.
+ */
 export const handleErrorApi = ({
   error,
   setError,
@@ -19,8 +38,9 @@ export const handleErrorApi = ({
   setError?: UseFormSetError<any>;
   duration?: number;
 }) => {
+  // Kiểm tra nếu lỗi là instance của EntityError và hàm setError có sẵn (nghĩa là đang sử dụng form)
   if (error instanceof EntityError && setError) {
-    // nếu mà có lỗi 422 thì nó sẽ lặp qua từng lỗi và gọi setError để hiển thị lỗi
+    // Nếu nhận được lỗi 422, lặp qua từng lỗi và gọi setError để hiển thị thông báo lỗi ở trường tương ứng
     error.payload.errors.forEach((item) => {
       setError(item.field, {
         type: "server",
@@ -28,88 +48,232 @@ export const handleErrorApi = ({
       });
     });
   } else {
+    // Nếu không phải lỗi từ EntityError, hiển thị toast thông báo lỗi tổng quát
     toast("Lỗi", {
       description: error?.payload?.message ?? "Lỗi không xác định",
       action: {
         label: "Ẩn",
         onClick: () => console.log("Lỗi"),
       },
-      duration: duration ?? 5000,
+      duration: duration ?? 5000, // Thời gian hiển thị toast (mặc định 5000ms)
     });
   }
 };
+
 /**
- * Xóa đi ký tự `/` đầu tiên của path
+ * Hàm normalizePath:
+ * - Xóa ký tự '/' đầu tiên trong chuỗi path nếu có.
+ *
+ * @param path Chuỗi đường dẫn cần chuẩn hóa.
+ * @returns Chuỗi path đã được loại bỏ ký tự '/' đầu tiên (nếu có).
  */
 export const normalizePath = (path: string) => {
   return path.startsWith("/") ? path.slice(1) : path;
 };
 
+/**
+ * Hàm decodeJWT:
+ * - Giải mã token JWT và trả về payload chứa thông tin bên trong.
+ * - Sử dụng generic để cho phép chỉ định kiểu dữ liệu cho payload, mặc định là any.
+ *
+ * @param token Chuỗi token JWT.
+ * @returns Payload của token dưới dạng đối tượng.
+ */
 export const decodeJWT = <Payload = any>(token: string) => {
   return jwt.decode(token) as Payload;
 };
 
-const isBrowser = typeof window !== "undefined"; // thằng này được sử dụng trong nav-items.tsx, kiểm tra trước vì nav-items.tsx với use client nó sẽ chạy ở 2 môi trường, 1 là lúc build, 2 là lúc chạy ở browser, nên nó sẽ bị lỗi localStorage is not defined
+// Biến isBrowser dùng để kiểm tra xem mã có đang chạy trong môi trường trình duyệt không
+// Điều này quan trọng khi truy cập localStorage, vì localStorage chỉ có sẵn ở phía client
+const isBrowser = typeof window !== "undefined";
+
+/**
+ * Hàm getAccessTokenFromLocalStorage:
+ * - Lấy accessToken từ localStorage nếu đang chạy trên trình duyệt.
+ *
+ * @returns accessToken dưới dạng chuỗi hoặc null nếu không tìm thấy hoặc không phải môi trường browser.
+ */
 export const getAccessTokenFromLocalStorage = () =>
   isBrowser ? localStorage.getItem("accessToken") : null;
+
+/**
+ * Hàm getRefreshTokenFromLocalStorage:
+ * - Lấy refreshToken từ localStorage nếu đang chạy trên trình duyệt.
+ *
+ * @returns refreshToken dưới dạng chuỗi hoặc null nếu không tìm thấy hoặc không phải môi trường browser.
+ */
 export const getRefreshTokenFromLocalStorage = () =>
   isBrowser ? localStorage.getItem("refreshToken") : null;
 
+/**
+ * Hàm setAccessTokenToLocalStorage:
+ * - Lưu accessToken vào localStorage nếu đang chạy trên trình duyệt.
+ *
+ * @param accessToken Chuỗi accessToken cần lưu.
+ */
 export const setAccessTokenToLocalStorage = (accessToken: string) =>
   isBrowser ? localStorage.setItem("accessToken", accessToken) : null;
+
+/**
+ * Hàm setRefreshTokenToLocalStorage:
+ * - Lưu refreshToken vào localStorage nếu đang chạy trên trình duyệt.
+ *
+ * @param refreshToken Chuỗi refreshToken cần lưu.
+ */
 export const setRefreshTokenToLocalStorage = (refreshToken: string) =>
   isBrowser ? localStorage.setItem("refreshToken", refreshToken) : null;
 
+/**
+ * Hàm removeTokensFromLocalStorage:
+ * - Xóa accessToken và refreshToken khỏi localStorage.
+ */
 export const removeTokensFromLocalStorage = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
 };
 
+/**
+ * Hàm checkAndRefreshToken:
+ * - Kiểm tra thời gian hết hạn của access token và refresh token.
+ * - Nếu refresh token đã hết hạn, xóa token và gọi onError.
+ * - Nếu access token sắp hết hạn (dưới 1/3 thời gian hiệu lực), gọi API để refresh token.
+ * - Sau khi refresh thành công, cập nhật lại access token và refresh token trong localStorage và gọi onSuccess.
+ *
+ * @param params (Tùy chọn) Object chứa các hàm callback onError và onSuccess.
+ */
 export const checkAndRefreshToken = async (params?: {
-  // params là một object có thể có hoặc không có, nếu có thì nó sẽ có 2 key là onError và onSuccess và cả 2 đều là function
   onError?: () => void;
   onSuccess?: () => void;
 }) => {
-  // không nên đưa logic lấy access, refresh token ra khỏi func checkAndRefresh
-  // vì để mỗi lần checkAndRefreshToken chạy thì nó sẽ fetch lại cho chúng ta cặp token mới
-  // tránh hiện tượng bug nó lấy token cũ ở lần đầu rồi gọi cho các lần tiếp theo
+  // Lấy accessToken và refreshToken từ localStorage
   const accessToken = localStorage.getItem("accessToken");
   const refreshToken = localStorage.getItem("refreshToken");
-  // chưa đăng nhập thì củng không cho chạy
+
+  // Nếu chưa đăng nhập (không có token nào) thì không thực hiện tiếp
   if (!accessToken || !refreshToken) return;
+
+  // Giải mã token để lấy thông tin thời gian hết hạn (exp) và thời gian tạo (iat)
   const decodedAccessToken = jwt.decode(accessToken) as {
-    exp: number; // thời điểm hết hạn của token (đơn vị: s)
-    iat: number; // thời điểm tạo token (đơn vị: s)
+    exp: number; // thời điểm hết hạn của token (đơn vị: giây)
+    iat: number; // thời điểm tạo token (đơn vị: giây)
   };
   const decodedRefreshToken = jwt.decode(refreshToken) as {
-    exp: number; // thời điểm hết hạn của token (đơn vị: s)
-    iat: number; // thời điểm tạo token (đơn vị: s)
+    exp: number; // thời điểm hết hạn của token (đơn vị: giây)
+    iat: number; // thời điểm tạo token (đơn vị: giây)
   };
-  // thời điểm hết hạn của token được tính theo epoch time (s)
-  // còn khi dùng cú pháp new Date().getTime() thì nó trả về epoch time (ms)
 
-  // bug ở đây có 2 vấn đề, 1 là làm tròn lên dẫn đến hết hạn sớm hơn. 2 là cookie đổi sang ms nó cao hơn vài trăm ms so với epoch time trong localStorage. dẫn đến middleware check có token nên => /home thay vì /login
-  const now = (new Date().getTime() / 1000) - 1; // không làm tròn chỗ này (-1s trừ hao do trong cookie hết hạn trễ hơn localStorage vài trăm ms)
-  // trường hợp refresh token hết hạn thì không xử lý nữa
+  // Lấy thời gian hiện tại tính theo giây (epoch time), trừ 1 giây để khắc phục chênh lệch nhỏ
+  const now = (new Date().getTime() / 1000) - 1;
+
+  // Nếu refresh token đã hết hạn, xóa token khỏi localStorage và gọi callback onError (nếu có)
   if (now >= decodedRefreshToken.exp) {
     removeTokensFromLocalStorage();
     if (params?.onError) return params.onError();
-  } // nếu số giây ở thời điểm hiện tại lớn hơn số giây ở thời điểm hết hạn của token thì token đã hết hạn
-  // ví dụ access token hết hạn 10 phút thì mình sẽ kiểm tra 1/3 thời gian (3p) thì mình sẽ cho refresh token lại.
-  // thời gian còn lại sẽ tính dựa trên công thức: decodedAccessToken.exp - now
-  // thời gian hết hạn của access token dựa trên công thức: decodedAccessToken.exp - decodedAccessToken.iat
+  }
+
+  // Kiểm tra thời gian còn lại của access token:
+  // Nếu thời gian còn lại của access token nhỏ hơn 1/3 tổng thời gian hiệu lực của nó,
+  // thì gọi API refresh token để lấy cặp token mới.
   if (
     decodedAccessToken.exp - now <
     (decodedAccessToken.exp - decodedAccessToken.iat) / 3
   ) {
-    // gọi API refresh token
     try {
-      const response = await authApiRequest.cRefreshToken(); // nếu thực chất refresh token nó vừa mới hết hạn rồi nhưng ta cố tình trừ now đi 1s thì tính là chưa hết hạn, xuống dưới đây gọi api thì nó check đã hết hạn rồi thì sẽ đc tự logout thôi
+      // Gọi API refresh token sử dụng authApiRequest
+      const response = await authApiRequest.cRefreshToken();
+      // Cập nhật access token và refresh token mới vào localStorage
       setAccessTokenToLocalStorage(response.payload.data.accessToken);
       setRefreshTokenToLocalStorage(response.payload.data.refreshToken);
+      // Gọi callback onSuccess nếu có
       if (params?.onSuccess) params.onSuccess();
     } catch (error) {
+      // Nếu có lỗi khi gọi API refresh token, gọi callback onError nếu có
       if (params?.onError) params.onError();
     }
   }
+};
+
+/**
+ * Hàm formatCurrency:
+ * - Định dạng số thành chuỗi tiền tệ theo định dạng Việt Nam (VND).
+ *
+ * @param number Số cần định dạng.
+ * @returns Chuỗi số đã được định dạng theo tiền tệ Việt Nam.
+ */
+export const formatCurrency = (number: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(number);
+};
+
+/**
+ * Hàm getVietnameseDishStatus:
+ * - Chuyển đổi trạng thái của món ăn sang dạng tiếng Việt.
+ *
+ * @param status Trạng thái của món ăn (các giá trị từ DishStatus).
+ * @returns Chuỗi trạng thái món ăn bằng tiếng Việt.
+ * @status: (typeof DishStatus)[keyof typeof DishStatus]: lấy tất cả các giá trị (values) tương ứng với các khóa của đối tượng hoặc enum (có nghĩa là status có thể nhận bất kỳ giá trị nào từ DishStatus)
+ */
+export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
+  switch (status) {
+    case DishStatus.Available:
+      return 'Có sẵn';
+    case DishStatus.Unavailable:
+      return 'Không có sẵn';
+    default:
+      return 'Ẩn';
+  }
+};
+
+/**
+ * Hàm getVietnameseOrderStatus:
+ * - Chuyển đổi trạng thái của đơn hàng sang dạng tiếng Việt.
+ *
+ * @param status Trạng thái của đơn hàng (các giá trị từ OrderStatus).
+ * @returns Chuỗi trạng thái đơn hàng bằng tiếng Việt.
+ */
+export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
+  switch (status) {
+    case OrderStatus.Delivered:
+      return 'Đã phục vụ';
+    case OrderStatus.Paid:
+      return 'Đã thanh toán';
+    case OrderStatus.Pending:
+      return 'Chờ xử lý';
+    case OrderStatus.Processing:
+      return 'Đang nấu';
+    default:
+      return 'Từ chối';
+  }
+};
+
+/**
+ * Hàm getVietnameseTableStatus:
+ * - Chuyển đổi trạng thái của bàn ăn sang dạng tiếng Việt.
+ *
+ * @param status Trạng thái của bàn (các giá trị từ TableStatus).
+ * @returns Chuỗi trạng thái bàn ăn bằng tiếng Việt.
+ */
+export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof typeof TableStatus]) => {
+  switch (status) {
+    case TableStatus.Available:
+      return 'Có sẵn';
+    case TableStatus.Reserved:
+      return 'Đã đặt';
+    default:
+      return 'Ẩn';
+  }
+};
+
+/**
+ * Hàm getTableLink:
+ * - Tạo đường dẫn (URL) cho bàn ăn dựa trên số bàn và token.
+ *
+ * @param token Token xác thực để truy cập API.
+ * @param tableNumber Số thứ tự của bàn.
+ * @returns Một URL hoàn chỉnh để truy cập thông tin bàn.
+ */
+export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
+  return envConfig.NEXT_PUBLIC_API_URL + '/tables/' + tableNumber + '?token=' + token;
 };

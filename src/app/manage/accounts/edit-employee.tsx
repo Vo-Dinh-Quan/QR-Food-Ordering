@@ -257,6 +257,7 @@ export default function EditEmployee({
                             className="w-full"
                             type="password"
                             {...field}
+                            value={field.value || ""}
                           />
                           <FormMessage />
                         </div>
@@ -281,6 +282,7 @@ export default function EditEmployee({
                             className="w-full"
                             type="password"
                             {...field}
+                            value={field.value || ""}
                           />
                           <FormMessage />
                         </div>
