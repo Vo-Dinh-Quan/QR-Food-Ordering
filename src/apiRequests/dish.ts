@@ -10,7 +10,7 @@ const prefix = "/dishes";
 
 const dishApiRequest = {
   list: () => http.get<DishListResType>(`${prefix}/`),
-  add: (body: CreateDishBodyType) => http.post<DishResType>(`${prefix}/`, body),
+  add: (body: CreateDishBodyType) => http.post<DishResType>(`${prefix}`, body),
   getDish: (id: number) => http.get<DishResType>(`${prefix}/detail/${id}`),
   updateDish: (id: number, body: UpdateDishBodyType) =>
     http.put<DishResType>(`${prefix}/detail/${id}`, body),
