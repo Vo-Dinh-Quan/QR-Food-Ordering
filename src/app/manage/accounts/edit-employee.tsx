@@ -22,7 +22,7 @@ import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { useGetAccount, useUpdateAccountMutation } from "@/queries/useAccount";
-import { number } from "zod";
+import { number, set } from "zod";
 import { useUploadMediaMutation } from "@/queries/useMedia";
 import { toast } from "sonner";
 import { handleErrorApi } from "@/lib/utils";
@@ -77,7 +77,9 @@ export default function EditEmployee({
       });
     }
   }, [data, form]);
+
   const reset = () => {
+    setId(undefined);
     form.reset();
     setFile(null);
   };
@@ -114,10 +116,10 @@ export default function EditEmployee({
           onClick: () => console.log("Undo"),
         },
       });
+      reset();
       if (onSubmitSuccess) {
         onSubmitSuccess();
       }
-      reset();
     } catch (error) {
       // Xử lý lỗi từ API, set lỗi lên form nếu có
       handleErrorApi({
@@ -132,7 +134,7 @@ export default function EditEmployee({
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          setId(undefined);
+          reset();
         }
       }}>
       <DialogContent className="sm:max-w-[600px] max-h-screen overflow-auto">
