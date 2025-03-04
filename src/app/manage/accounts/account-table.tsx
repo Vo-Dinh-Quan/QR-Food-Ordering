@@ -199,7 +199,7 @@ function AlertDialogDeleteAccount({
       } catch (error) {
         handleErrorApi({
           error,
-        })
+        });
       }
     }
   };
@@ -227,7 +227,9 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={deleteAccount}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={deleteAccount}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -254,7 +256,6 @@ export default function AccountTable() {
 
   const accountListQuery = useGetAccountList();
   const data = accountListQuery.data?.payload.data ?? [];
-
   // Các state quản lý trạng thái sắp xếp, lọc cột, ẩn hiện cột và lựa chọn dòng
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
