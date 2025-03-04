@@ -75,7 +75,7 @@ export default function EditDish({
                   <FormItem>
                     <div className='flex gap-2 items-start justify-start'>
                       <Avatar className='aspect-square w-[100px] h-[100px] rounded-md object-cover'>
-                        <AvatarImage src={previewAvatarFromFile} />
+                        <AvatarImage src={previewAvatarFromFile} className='object-cover'/>
                         <AvatarFallback className='rounded-none'>{name || 'Avatar'}</AvatarFallback>
                       </Avatar>
                       <input
