@@ -10,7 +10,7 @@ const UNAUTHENTICATED_PAGES = ["/login", "/logout", "refresh-token"];
 export default function RefreshToken() {
   const router = useRouter()
   const pathname = usePathname();
-  console.log("pathname", pathname);
+  // console.log("pathname", pathname);
   useEffect(() => {
     if (UNAUTHENTICATED_PAGES.includes(pathname)) return;
     let interval: any = null;

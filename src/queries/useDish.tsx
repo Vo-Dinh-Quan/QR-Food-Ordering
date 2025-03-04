@@ -13,7 +13,7 @@ export const useDishListQuery = () => {
   });
 };
 
-export const useGetDishQuery = ({ id, enable }: { id: number, enable: boolean }) => {
+export const useGetDish = ({ id, enable }: { id: number, enable: boolean }) => {
   return useQuery({
     queryKey: ["dishes", id],
     queryFn: () => dishApiRequest.getDish(id),
