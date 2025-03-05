@@ -88,7 +88,7 @@ export const columns: ColumnDef<DishItem>[] = [
     header: "Ảnh",
     cell: ({ row }) => (
       <div>
-        <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
+        <Avatar className="aspect-square w-[80px] h-[80px] rounded-md object-cover">
           <AvatarImage src={row.getValue("image")} className="object-cover" />
           <AvatarFallback className="rounded-none">
             {row.original.name}

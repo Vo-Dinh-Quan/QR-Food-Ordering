@@ -108,7 +108,7 @@ export const columns: ColumnDef<AccountType>[] = [
     cell: ({ row }) => (
       <div>
         {/* Sử dụng component Avatar để hiển thị ảnh đại diện */}
-        <Avatar className="aspect-square w-[100px] h-[100px] rounded-md object-cover">
+        <Avatar className="aspect-square w-[80px] h-[80px] rounded-md object-cover">
           <AvatarImage src={row.getValue("avatar")} className="object-cover" />
           {/* Nếu không load được ảnh, hiển thị fallback là tên của nhân viên */}
           <AvatarFallback className="rounded-none">
