@@ -1,61 +1,61 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import dishApiRequest from "@/apiRequests/dish";
-import { UpdateDishBodyType } from "@/schemaValidations/dish.schema";
+import tableApiRequest from "@/apiRequests/table";
+import { UpdateTableBodyType } from "@/schemaValidations/table.schema";
 
-export const useDishListQuery = () => {
+export const useTableListQuery = () => {
   return useQuery({
-    queryKey: ["dishes"],
-    queryFn: dishApiRequest.list,
+    queryKey: ["tables"],
+    queryFn: tableApiRequest.list,
   });
 };
 
-export const useGetDish = ({ id, enable }: { id: number, enable: boolean }) => {
+export const useGetTable = ({ id, enable }: { id: number, enable: boolean }) => {
   return useQuery({
-    queryKey: ["dishes", id],
-    queryFn: () => dishApiRequest.getDish(id),
+    queryKey: ["tables", id],
+    queryFn: () => tableApiRequest.getTable(id),
     enabled: enable
   });
 };
 
-export const useAddDishMutation = () => {
+export const useAddTableMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: dishApiRequest.add,
+    mutationFn: tableApiRequest.add,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["dishes"],
+        queryKey: ["tables"],
       });
     },
   });
 };
 
-export const useUpdateDishMutation = () => {
+export const useUpdateTableMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     // nhận vào 1 đối tượng có kiểu dữ liệu là UpdateEmployeeAccountBodyType và có thêm id
     // cú pháp {id,...body} để lấy ra id và còn lại là body
-    mutationFn: ({id,...body}: UpdateDishBodyType & { id: number }) =>
-      dishApiRequest.updateDish(id, body),
+    mutationFn: ({id,...body}: UpdateTableBodyType & { id: number }) =>
+      tableApiRequest.updateTable(id, body),
     onSuccess: (_, { id }) => {
       // _ là kết quả của mutationFn, không sử dụng trong trường hợp này
       // { id } là đối tượng chứa các tham số mà bạn đã truyền vào mutationFn
       queryClient.invalidateQueries({
-        queryKey: ["dishes"],
+        queryKey: ["tables"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["dishes", id],
+        queryKey: ["tables", id],
       });
     },
   });
 };
 
-export const useDeleteDishMutation = () => {
+export const useDeleteTableMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn:  dishApiRequest.deleteDish,
+    mutationFn:  tableApiRequest.deleteTable,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["dishes"],
+        queryKey: ["tables"],
       });
     },
   });
