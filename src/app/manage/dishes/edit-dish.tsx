@@ -39,6 +39,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useUploadMediaMutation } from "@/queries/useMedia";
 import { useGetDish, useUpdateDishMutation } from "@/queries/useDish";
 import { toast } from "sonner";
+import revalidateApiRequest from "@/apiRequests/revalidate";
 
 export default function EditDish({
   id,
@@ -120,6 +121,7 @@ export default function EditDish({
       }
       // Gọi mutation để cập nhật thông tin cá nhân với dữ liệu đã xử lý
       const response = await updateDishMutation.mutateAsync(body);
+      await revalidateApiRequest("Dish");
       // Hiển thị thông báo thành công cho người dùng
       toast(response.payload.message, {
         action: {
