@@ -13,7 +13,7 @@ function LogoutContent() {
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get("refreshToken");
   const accessTokenFromUrl = searchParams.get("accessToken");
-  const {setIsAuth} = useAppContext();
+  const { setRole } = useAppContext();
   const { mutateAsync } = useLogoutMutation();
   const router = useRouter();
 
@@ -32,13 +32,13 @@ function LogoutContent() {
         setTimeout(() => {
           ref.current = null;
         }, 1000);
-        setIsAuth(false);
+        setRole(undefined);
         router.push("/login");
       });
     }else {
       router.push("/login");
     }
-  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setIsAuth]);
+  }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setRole]);
   return <div>Logout ... </div>;
 }
 

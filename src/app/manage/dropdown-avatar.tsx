@@ -20,7 +20,7 @@ export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const router = useRouter();
   const { data } = useAccountMe();
-  const {setIsAuth} = useAppContext();
+  const { setRole } = useAppContext();
   const account = data?.payload.data;
   const logout = async () => {
     if (logoutMutation.isPending) return;
@@ -28,7 +28,7 @@ export default function DropdownAvatar() {
       await logoutMutation.mutateAsync();
       // sau phần này, trong http.ts nó sẽ có phần xóa localStorage cho mình rồi
       router.push("/");
-      setIsAuth(false);
+      setRole(undefined);
     } catch (error: any) {
       handleErrorApi({ error });
     }

@@ -7,12 +7,13 @@ import jwt from "jsonwebtoken";
 import authApiRequest from "@/apiRequests/auth";
 import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
 import envConfig from "@/config";
+import { TokenPayload } from "@/types/jwt.types";
 
 /**
  * Hàm cn:
  * - Kết hợp các class CSS thông qua clsx và sau đó hợp nhất chúng bằng twMerge để đảm bảo không có class trùng lặp.
  *
- * @param inputs Danh sách các giá trị class (có thể là chuỗi, mảng, đối tượng) 
+ * @param inputs Danh sách các giá trị class (có thể là chuỗi, mảng, đối tượng)
  * @returns Một chuỗi class CSS đã được gộp lại.
  */
 export function cn(...inputs: ClassValue[]) {
@@ -33,7 +34,7 @@ export const handleErrorApi = ({
   error,
   setError,
   duration,
-} : {
+}: {
   error: any;
   setError?: UseFormSetError<any>;
   duration?: number;
@@ -153,17 +154,10 @@ export const checkAndRefreshToken = async (params?: {
   if (!accessToken || !refreshToken) return;
 
   // Giải mã token để lấy thông tin thời gian hết hạn (exp) và thời gian tạo (iat)
-  const decodedAccessToken = jwt.decode(accessToken) as {
-    exp: number; // thời điểm hết hạn của token (đơn vị: giây)
-    iat: number; // thời điểm tạo token (đơn vị: giây)
-  };
-  const decodedRefreshToken = jwt.decode(refreshToken) as {
-    exp: number; // thời điểm hết hạn của token (đơn vị: giây)
-    iat: number; // thời điểm tạo token (đơn vị: giây)
-  };
-
+  const decodedAccessToken = decodeToken(accessToken);
+  const decodedRefreshToken = decodeToken(refreshToken);
   // Lấy thời gian hiện tại tính theo giây (epoch time), trừ 1 giây để khắc phục chênh lệch nhỏ
-  const now = (new Date().getTime() / 1000) - 1;
+  const now = new Date().getTime() / 1000 - 1;
 
   // Nếu refresh token đã hết hạn, xóa token khỏi localStorage và gọi callback onError (nếu có)
   if (now >= decodedRefreshToken.exp) {
@@ -201,9 +195,9 @@ export const checkAndRefreshToken = async (params?: {
  * @returns Chuỗi số đã được định dạng theo tiền tệ Việt Nam.
  */
 export const formatCurrency = (number: number) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
   }).format(number);
 };
 
@@ -215,14 +209,16 @@ export const formatCurrency = (number: number) => {
  * @returns Chuỗi trạng thái món ăn bằng tiếng Việt.
  * @status: (typeof DishStatus)[keyof typeof DishStatus]: lấy tất cả các giá trị (values) tương ứng với các khóa của đối tượng hoặc enum (có nghĩa là status có thể nhận bất kỳ giá trị nào từ DishStatus)
  */
-export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
+export const getVietnameseDishStatus = (
+  status: (typeof DishStatus)[keyof typeof DishStatus]
+) => {
   switch (status) {
     case DishStatus.Available:
-      return 'Có sẵn';
+      return "Có sẵn";
     case DishStatus.Unavailable:
-      return 'Không có sẵn';
+      return "Không có sẵn";
     default:
-      return 'Ẩn';
+      return "Ẩn";
   }
 };
 
@@ -233,18 +229,20 @@ export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof
  * @param status Trạng thái của đơn hàng (các giá trị từ OrderStatus).
  * @returns Chuỗi trạng thái đơn hàng bằng tiếng Việt.
  */
-export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
+export const getVietnameseOrderStatus = (
+  status: (typeof OrderStatus)[keyof typeof OrderStatus]
+) => {
   switch (status) {
     case OrderStatus.Delivered:
-      return 'Đã phục vụ';
+      return "Đã phục vụ";
     case OrderStatus.Paid:
-      return 'Đã thanh toán';
+      return "Đã thanh toán";
     case OrderStatus.Pending:
-      return 'Chờ xử lý';
+      return "Chờ xử lý";
     case OrderStatus.Processing:
-      return 'Đang nấu';
+      return "Đang nấu";
     default:
-      return 'Từ chối';
+      return "Từ chối";
   }
 };
 
@@ -255,14 +253,16 @@ export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof type
  * @param status Trạng thái của bàn (các giá trị từ TableStatus).
  * @returns Chuỗi trạng thái bàn ăn bằng tiếng Việt.
  */
-export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof typeof TableStatus]) => {
+export const getVietnameseTableStatus = (
+  status: (typeof TableStatus)[keyof typeof TableStatus]
+) => {
   switch (status) {
     case TableStatus.Available:
-      return 'Có sẵn';
+      return "Có sẵn";
     case TableStatus.Reserved:
-      return 'Đã đặt';
+      return "Đã đặt";
     default:
-      return 'Ẩn';
+      return "Ẩn";
   }
 };
 
@@ -274,6 +274,18 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
  * @param tableNumber Số thứ tự của bàn.
  * @returns Một URL hoàn chỉnh để truy cập thông tin bàn.
  */
-export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
-  return envConfig.NEXT_PUBLIC_API_URL + '/tables/' + tableNumber + '?token=' + token;
+export const getTableLink = ({
+  token,
+  tableNumber,
+}: {
+  token: string;
+  tableNumber: number;
+}) => {
+  return (
+    envConfig.NEXT_PUBLIC_API_URL + "/tables/" + tableNumber + "?token=" + token
+  );
+};
+
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload;
 };
