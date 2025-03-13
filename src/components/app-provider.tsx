@@ -49,11 +49,10 @@ export default function AppProvider({
   const isAuth = Boolean(role);
 
   const setRole = (role?: RoleType | undefined) => {
-    if (role) {
-      setRoleState(role);
-    }else {
+    if (!role) {
       removeTokensFromLocalStorage();
     }
+    setRoleState(role);
   };
   return (
     <AppConText value={{ role, setRole, isAuth}}>

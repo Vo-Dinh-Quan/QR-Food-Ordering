@@ -2,29 +2,39 @@
 "use client";
 
 import { useAppContext } from "@/components/app-provider";
-import { getAccessTokenFromLocalStorage } from "@/lib/utils";
+import { Role } from "@/constants/type";
+import { cn, handleErrorApi } from "@/lib/utils";
+import { useLogoutMutation } from "@/queries/useAuth";
+import { useGuestLogoutMutation } from "@/queries/useGuest";
+import { RoleType } from "@/types/jwt.types";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
 
-const menuItems = [
+const menuItems: {
+  title: string;
+  href: string;
+  role?: RoleType[];
+  hideWhenLogin?: boolean;
+}[] = [
   {
-    title: "Món ăn",
-    href: "/menu", // authRequired = undefined nghĩa là đăng nhập hay chưa đều cho hiển thị
+    title: "Trang chủ",
+    href: "/", // authRequired = undefined nghĩa là đăng nhập hay chưa đều cho hiển thị
   },
   {
-    title: "Đơn hàng",
-    href: "/orders",
-    authRequired: true, // true nghĩa là đã đăng nhập thì mới hiển thị
+    title: "Thực đơn",
+    href: "/guest/menu",
+    role: [Role.Guest],
   },
   {
     title: "Đăng nhập",
     href: "/login",
-    authRequired: false, // false nghĩa là chưa đăng nhập thì sẽ hiển thị
+    hideWhenLogin: true,
   },
   {
     title: "Quản lý",
     href: "/manage/dashboard",
-    authRequired: true, // true nghĩa là đã đăng nhập thì mới hiển thị
+    role: [Role.Owner, Role.Employee],
   },
 ];
 
@@ -51,17 +61,56 @@ It can also happen if the client has a browser extension installed which messes 
 // hướng giải quyết: sử dụng useEffect để check trạng thái đăng nhập của user (theo gợi ý của nextjs)
 // cách này sẽ giúp tránh lỗi hydration failed và warning Content did not match
 export default function NavItems({ className }: { className?: string }) {
-  const { isAuth } = useAppContext();
-  return menuItems.map((item) => {
-    if (
-      (item.authRequired === false && isAuth) || // chưa đăng nhập thì mới hiển thị mà lại đã đăng nhập thì không hiển thị
-      (item.authRequired === true && !isAuth) // đã đăng nhập thì mới hiển thị mà lại chưa đăng nhập thì không hiển thị
-    )
-      return null;
-    return (
-      <Link href={item.href} key={item.href} className={className}>
-        {item.title}
-      </Link>
-    );
-  });
+  const { role, setRole } = useAppContext();
+  const logoutMutation = useLogoutMutation();
+  const guestLogoutMutation = useGuestLogoutMutation();
+  const router = useRouter();
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
+
+  const logout = async () => {
+    if (role === Role.Guest && logoutMutation.isPending) return;
+    if (role !== Role.Guest && guestLogoutMutation.isPending) return;
+    try {
+      if (role === Role.Guest) {
+        await guestLogoutMutation.mutateAsync();
+      } else {
+        await logoutMutation.mutateAsync();
+      }
+      // sau phần này, trong http.ts nó sẽ có phần xóa localStorage cho mình rồi
+      router.push("/");
+      setRole(undefined);
+      setIsLoggedOut(true);
+    } catch (error: any) {
+      handleErrorApi({ error });
+    }
+  };
+  useEffect(() => {
+    if (isLoggedOut) {
+      setIsLoggedOut(false);
+    }
+  },[isLoggedOut]);
+
+  return (
+    <>
+      {menuItems.map((item) => {
+        // trường hợp đăng nhập thì chỉ hiển thị menu đăng nhập
+        const isAuth = item.role && role && item.role.includes(role);
+        // trường hợp menu item có thể hiển thị dù cho đã đăng nhập hay chưa
+        const canShow = (item.role === undefined && !item.hideWhenLogin) || (!role && item.hideWhenLogin);
+        if (isAuth || canShow) {
+          return (
+            <Link href={item.href} key={item.href} className={className}>
+              {item.title}
+            </Link>
+          );
+        }
+        return null;
+      })}
+      {role && (
+        <div className={cn(className, "cursor-pointer")} onClick={logout}>
+          Đăng xuất
+        </div>
+      )}
+    </>
+  );
 }
