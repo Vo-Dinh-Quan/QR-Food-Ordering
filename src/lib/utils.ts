@@ -5,9 +5,10 @@ import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import jwt from "jsonwebtoken";
 import authApiRequest from "@/apiRequests/auth";
-import { DishStatus, OrderStatus, TableStatus } from "@/constants/type";
+import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
 import envConfig from "@/config";
 import { TokenPayload } from "@/types/jwt.types";
+import guestApiRequest from "@/apiRequests/guest";
 
 /**
  * Hàm cn:
@@ -173,8 +174,12 @@ export const checkAndRefreshToken = async (params?: {
     (decodedAccessToken.exp - decodedAccessToken.iat) / 3
   ) {
     try {
-      // Gọi API refresh token sử dụng authApiRequest
-      const response = await authApiRequest.cRefreshToken();
+      const role = decodedRefreshToken.role;
+      // Gọi API refresh token sử dụng authApiRequest hoặc guestApiRequest tùy theo role
+      const response =
+        role === Role.Guest
+          ? await guestApiRequest.cRefreshToken()
+          : await authApiRequest.cRefreshToken();
       // Cập nhật access token và refresh token mới vào localStorage
       setAccessTokenToLocalStorage(response.payload.data.accessToken);
       setRefreshTokenToLocalStorage(response.payload.data.refreshToken);
