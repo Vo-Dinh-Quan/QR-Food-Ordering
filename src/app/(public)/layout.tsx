@@ -43,21 +43,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </nav>
             </SheetContent>
           </Sheet>
-          <nav className="hidden md:flex md:items-center md:gap-5 md:text-sm">
+          <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
             <Link
               href="/"
               className="flex items-center gap-2 text-lg font-semibold md:text-base">
               <Package2 className="h-6 w-6" />
               <span className="sr-only">Big boy</span>
             </Link>
-            <NavItems className="text-muted-foreground transition-colors hover:text-foreground" />
+            <NavItems className="text-muted-foreground transition-colors hover:text-foreground flex-shrink-0" />
           </nav>
         </div>
 
         {/* Center: Logo */}
         <div className="flex justify-center">
           <Link href="/" className="flex items-center">
-            {/* Logo đen sẽ hiển thị ở light mode */}
             <Image
               src="/bin-restaurant_logo_black.svg"
               alt="Logo"
@@ -65,9 +64,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               height={40}
               className="block dark:hidden"
             />
-            {/* Logo trắng sẽ hiển thị ở dark mode */}
             <Image
-              src="/bin-restaurant_logo_white.svg" // Giả sử đây là logo trắng của bạn
+              src="/bin-restaurant_logo_white.svg"
               alt="Logo"
               width={40}
               height={40}
@@ -81,6 +79,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <DarkModeToggle />
         </div>
       </header>
+
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         {children}
       </main>

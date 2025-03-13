@@ -19,11 +19,11 @@ export default async function Home() {
    return (
       <main className="w-full">
          {/* Hero Section */}
-         <section className="pb-10 px-4 flex flex-col-reverse md:flex-row items-center justify-center gap-8">
+         <section className=" flex flex-col-reverse md:flex-row items-center justify-center gap-8">
             {/* Text Content (40%) */}
             <div className="w-full md:w-2/5">
-               <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 leading-tight">
-                  Chúng tôi không nấu ăn, chúng tôi tạo ra cảm xúc của bạn!
+               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                  Chúng tôi không nấu ăn, chúng tôi tạo ra cảm xúc của bạn! 🍕
                </h1>
                <p className="leading-7 [&:not(:first-child)]:mt-6">
                   Món ăn Việt Nam khiến người ta liên tưởng đến những bữa tối
@@ -33,42 +33,40 @@ export default async function Home() {
             </div>
 
             {/* Hero Image */}
-            <div className="w-full md:w-3/5 flex justify-center relative">
+            <div className="w-full md:w-3/5 flex justify-center lg:justify-end relative">
                <div className="relative inline-block">
                   <h2 className="absolute top-[0%] left-[0%] scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
                      BIN KING – The Taste of Royalty
                   </h2>
-                  {/* Ảnh chính (có thể để hình tròn hoặc bo góc) */}
                   <Image
-                     src="/banner1.png" // Thay bằng đường dẫn ảnh chính
+                     src="/banner1.png"
                      alt="Hero Dish"
                      width={500}
                      height={500}
-                     // Có thể để "rounded-md" nếu bạn không muốn tròn hoàn toàn
-                     className="rounded-full object-cover hover:scale-105 transition transform duration-300"
+                     className="rounded-full mt-10 md:mt-5 lg:mt-0 object-cover hover:scale-105 transition transform duration-300"
                   />
 
-                  {/* 3 ảnh nhỏ quanh mép bên phải, bạn tuỳ chỉnh toạ độ */}
+                  {/* 3 Small Images */}
                   <Image
-                     src="/banner2.png" // Thay đường dẫn ảnh 2
+                     src="/banner2.png"
                      alt="Mini Banner 1"
                      width={100}
                      height={100}
-                     className="rounded-full object-cover absolute top-[15%] right-[-15%] hover:scale-105 transition transform duration-300"
+                     className="rounded-full object-cover absolute top-[15%] left-[-15%] hover:scale-105 transition transform duration-300 hidden xl:block"  // Hidden on mobile
                   />
                   <Image
-                     src="/banner3.png" // Thay đường dẫn ảnh 3
+                     src="/banner3.png"
                      alt="Mini Banner 2"
                      width={100}
                      height={100}
-                     className="rounded-full object-cover absolute top-[50%] right-[-20%] translate-y-[-50%] hover:scale-105 transition transform duration-300"
+                     className="rounded-full object-cover absolute top-[50%] left-[-20%] translate-y-[-50%] hover:scale-105 transition transform duration-300 hidden xl:block"  // Hidden on mobile
                   />
                   <Image
-                     src="/banner4.png" // Thay đường dẫn ảnh 4
+                     src="/banner4.png"
                      alt="Mini Banner 3"
                      width={80}
                      height={80}
-                     className="rounded-full object-cover absolute bottom-[15%] right-[-15%] hover:scale-105 transition transform duration-300"
+                     className="rounded-full object-cover absolute bottom-[15%] left-[-15%] hover:scale-105 transition transform duration-300 hidden xl:block"  // Hidden on mobile
                   />
                </div>
             </div>
@@ -81,22 +79,19 @@ export default async function Home() {
                   Món Ăn Tốt Nhất Cho Những Khoảnh Khắc Đẹp Nhất
                </h2>
 
-               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                   {dishList.map((dish) => (
                      <div
                         key={dish.id}
-                        className="m-4 rounded-xl overflow-hidden" // thêm overflow-hidden ở đây
-                     >
+                        className="m-4 rounded-xl overflow-hidden">
                         <Image
                            src={dish.image}
                            width={400}
                            height={400}
                            alt={dish.name}
-                           className="w-[250px] h-[250px] object-cover mb-4 hover:scale-105 transition transform duration-300"
+                           className="w-full h-[250px] object-cover mb-4 hover:scale-105 transition transform duration-300"
                         />
-                        <h3 className="text-xl font-semibold mb-2">
-                           {dish.name}
-                        </h3>
+                        <h3 className="text-xl font-semibold mb-2">{dish.name}</h3>
                         <p className="text-sm mb-2">{dish.description}</p>
                         <p className="text-lg font-bold mb-2">
                            {formatCurrency(dish.price)}
