@@ -255,7 +255,7 @@ export default function EditDish({
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea
                           id="description"
-                          className="w-full"
+                          className="w-full h-[100px]"
                           {...field}
                         />
                         <FormMessage />

@@ -20,7 +20,7 @@ export const useGuestOrderMutation = () => {
   });
 }
 
-export const useGuestGetOrderListQuery = () => {
+export const useGuestGetOrderList = () => {
   return useQuery({
     queryFn: guestApiRequest.getOrderList,
     queryKey: ["guest-orders"],
