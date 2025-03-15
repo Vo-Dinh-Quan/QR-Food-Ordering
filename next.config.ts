@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
         pathname: '/**',
         search: '',
       },
+      {
+        hostname: 'unsplash.com',
+        pathname: '/**',
+      },
     ],
   },
 };
