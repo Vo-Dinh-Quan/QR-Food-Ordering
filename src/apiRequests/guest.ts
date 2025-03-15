@@ -4,7 +4,7 @@ import {
   RefreshTokenBodyType,
   RefreshTokenResType,
 } from "@/schemaValidations/auth.schema";
-import { GuestLoginBodyType, GuestLoginResType } from "@/schemaValidations/guest.schema";
+import { GuestCreateOrdersBodyType, GuestCreateOrdersResType, GuestGetOrdersResType, GuestLoginBodyType, GuestLoginResType } from "@/schemaValidations/guest.schema";
 
 const guestApiRequest = {
   // khai báo 1 key ban đầu là null và kiểu dữ liệu là Promise<RefreshTokenResType> | null
@@ -54,6 +54,9 @@ const guestApiRequest = {
     this.refreshTokenRequest = null;
     return response;
   },
+  order: (body: GuestCreateOrdersBodyType) => http.post<GuestCreateOrdersResType>("/guest/orders", body),
+  getOrderList: () => http.get<GuestGetOrdersResType>("/guest/orders"),
+
 };
 
 export default guestApiRequest;
