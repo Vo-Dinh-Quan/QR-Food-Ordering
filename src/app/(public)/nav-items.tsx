@@ -10,37 +10,49 @@ import { RoleType } from "@/types/jwt.types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 const menuItems: {
-  title: string;
-  href: string;
-  role?: RoleType[];
-  hideWhenLogin?: boolean;
+	title: string;
+	href: string;
+	role?: RoleType[];
+	hideWhenLogin?: boolean;
 }[] = [
-  {
-    title: "Trang chủ",
-    href: "/", // authRequired = undefined nghĩa là đăng nhập hay chưa đều cho hiển thị
-  },
-  {
-    title: "Thực đơn",
-    href: "/guest/menu",
-    role: [Role.Guest],
-  },
-  {
-    title: "Đơn hàng",
-    href: "/guest/orders",
-    role: [Role.Guest],
-  },
-  {
-    title: "Đăng nhập",
-    href: "/login",
-    hideWhenLogin: true,
-  },
-  {
-    title: "Quản lý",
-    href: "/manage/dashboard",
-    role: [Role.Owner, Role.Employee],
-  },
+	{
+		title: "Trang chủ",
+		href: "/", // authRequired = undefined nghĩa là đăng nhập hay chưa đều cho hiển thị
+	},
+	{
+		title: "Thực đơn",
+		href: "/guest/menu",
+		role: [Role.Guest],
+	},
+	{
+		title: "Đơn hàng",
+		href: "/guest/orders",
+		role: [Role.Guest],
+	},
+	{
+		title: "Đăng nhập",
+		href: "/login",
+		hideWhenLogin: true,
+	},
+	{
+		title: "Quản lý",
+		href: "/manage/dashboard",
+		role: [Role.Owner, Role.Employee],
+	},
 ];
 
 // Server: Món ăn, Đăng nhập. Do server không biết trạng thái đăng nhập của user
@@ -66,56 +78,74 @@ It can also happen if the client has a browser extension installed which messes 
 // hướng giải quyết: sử dụng useEffect để check trạng thái đăng nhập của user (theo gợi ý của nextjs)
 // cách này sẽ giúp tránh lỗi hydration failed và warning Content did not match
 export default function NavItems({ className }: { className?: string }) {
-  const { role, setRole } = useAppContext();
-  const logoutMutation = useLogoutMutation();
-  const guestLogoutMutation = useGuestLogoutMutation();
-  const router = useRouter();
-  const [isLoggedOut, setIsLoggedOut] = useState(false);
+	const { role, setRole } = useAppContext();
+	const logoutMutation = useLogoutMutation();
+	const guestLogoutMutation = useGuestLogoutMutation();
+	const router = useRouter();
+	const [isLoggedOut, setIsLoggedOut] = useState(false);
 
-  const logout = async () => {
-    if (role === Role.Guest && logoutMutation.isPending) return;
-    if (role !== Role.Guest && guestLogoutMutation.isPending) return;
-    try {
-      if (role === Role.Guest) {
-        await guestLogoutMutation.mutateAsync();
-      } else {
-        await logoutMutation.mutateAsync();
-      }
-      // sau phần này, trong http.ts nó sẽ có phần xóa localStorage cho mình rồi
-      router.push("/");
-      setRole(undefined);
-      setIsLoggedOut(true);
-    } catch (error: any) {
-      handleErrorApi({ error });
-    }
-  };
-  useEffect(() => {
-    if (isLoggedOut) {
-      setIsLoggedOut(false);
-    }
-  },[isLoggedOut]);
+	const logout = async () => {
+		if (role === Role.Guest && logoutMutation.isPending) return;
+		if (role !== Role.Guest && guestLogoutMutation.isPending) return;
+		try {
+			if (role === Role.Guest) {
+				await guestLogoutMutation.mutateAsync();
+			} else {
+				await logoutMutation.mutateAsync();
+			}
+			// sau phần này, trong http.ts nó sẽ có phần xóa localStorage cho mình rồi
+			router.push("/");
+			setRole(undefined);
+			setIsLoggedOut(true);
+		} catch (error: any) {
+			handleErrorApi({ error });
+		}
+	};
+	useEffect(() => {
+		if (isLoggedOut) {
+			setIsLoggedOut(false);
+		}
+	}, [isLoggedOut]);
 
-  return (
-    <>
-      {menuItems.map((item) => {
-        // trường hợp đăng nhập thì chỉ hiển thị menu đăng nhập
-        const isAuth = item.role && role && item.role.includes(role);
-        // trường hợp menu item có thể hiển thị dù cho đã đăng nhập hay chưa
-        const canShow = (item.role === undefined && !item.hideWhenLogin) || (!role && item.hideWhenLogin);
-        if (isAuth || canShow) {
-          return (
-            <Link href={item.href} key={item.href} className={className}>
-              {item.title}
-            </Link>
-          );
-        }
-        return null;
-      })}
-      {role && (
-        <div className={cn(className, "cursor-pointer")} onClick={logout}>
-          Đăng xuất
-        </div>
-      )}
-    </>
-  );
+	return (
+		<>
+			{menuItems.map((item) => {
+				// trường hợp đăng nhập thì chỉ hiển thị menu đăng nhập
+				const isAuth = item.role && role && item.role.includes(role);
+				// trường hợp menu item có thể hiển thị dù cho đã đăng nhập hay chưa
+				const canShow =
+					(item.role === undefined && !item.hideWhenLogin) ||
+					(!role && item.hideWhenLogin);
+				if (isAuth || canShow) {
+					return (
+						<Link href={item.href} key={item.href} className={className}>
+							{item.title}
+						</Link>
+					);
+				}
+				return null;
+			})}
+			{role && (
+				<AlertDialog>
+					<AlertDialogTrigger asChild>
+						<div className={cn(className, "cursor-pointer")}>
+							Đăng xuất
+						</div>
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Bạn có muốn đăng xuất không?</AlertDialogTitle>
+							<AlertDialogDescription>
+								Đăng xuất có thể làm mất đi dữ liệu đơn hàng của bạn
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>Thoát</AlertDialogCancel>
+							<AlertDialogAction onClick={logout}>Đăng xuất</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			)}
+		</>
+	);
 }
