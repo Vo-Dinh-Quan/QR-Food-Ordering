@@ -32,7 +32,7 @@ export function Description({ text }: { text: string }) {
 				</span>
 			) : (
 				// Khi ở trạng thái thu gọn: giới hạn 1 dòng với ellipsis
-				<span className="inline-block max-w-[200px] overflow-hidden whitespace-nowrap text-ellipsis align-top">
+				<span className="inline-block max-w-[150px] overflow-hidden whitespace-nowrap text-ellipsis align-top">
 					{text}
 				</span>
 			)}
@@ -97,7 +97,7 @@ export default function MenuOrder() {
 			{dishes.filter((dish) => dish.status !== DishStatus.Hidden).map((dish) => (
 				<div
 					key={dish.id}
-					className={cn("flex gap-4", {
+					className={cn("flex gap-2", {
 						"pointer-events-none": dish.status === DishStatus.Unavailable,
 					})}>
 					<div className="flex-shrink-0 relative">

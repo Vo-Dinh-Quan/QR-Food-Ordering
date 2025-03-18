@@ -1,20 +1,59 @@
 "use client";
+
 import { Description } from "@/app/guest/menu/menu-order";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import socket from "@/lib/socket";
 import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useGuestGetOrderList } from "@/queries/useGuest";
+import { UpdateOrderResType } from "@/schemaValidations/order.schema";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function OrdersCart() {
-	const { data } = useGuestGetOrderList();
+	const { data, refetch } = useGuestGetOrderList();
 	const orders = data?.payload.data || [];
+	console.log(orders);
 	const totalPrice = () => {
 		return orders.reduce((total, order) => {
 			return total + order.dishSnapshot.price * order.quantity;
 		}, 0);
 	};
+
+	useEffect(() => {
+		if (socket.connected) {
+			onConnect();
+		}
+		function onConnect() {
+			console.log(socket.id);
+		}
+
+		function onDisconnect() {
+			console.log("disconnect");
+		}
+
+		function onUpdateOrder(data: UpdateOrderResType["data"]) {
+      console.log(data);
+			refetch();
+			toast(`Món ${data.dishSnapshot.name} (SL: ${data.quantity}) vừa được cập nhật sang trạng thái ${getVietnameseOrderStatus(data.status)}`, {
+				action: {
+					label: "Ẩn",
+					onClick: () => console.log("Undo"),
+				},
+			});
+		}
+		socket.on("update-order", onUpdateOrder);
+
+		socket.on("connect", onConnect);
+		socket.on("disconnect", onDisconnect);
+
+		return () => {
+			socket.off("connect", onConnect);
+			socket.off("disconnect", onDisconnect);
+			socket.off("update-order", onUpdateOrder);
+		};
+	}, []);
+
 	return (
 		<>
 			{orders.map((order, index) => (
@@ -41,7 +80,11 @@ export default function OrdersCart() {
 							<Badge className="px-1">{order.quantity}</Badge>
 						</div>
 					</div>
-          <div className="flex-shrink-0 ml-auto flex justify-center items-center"><Badge variant={'outline'} className="px-1">{getVietnameseOrderStatus(order.status)}</Badge></div>
+					<div className="flex-shrink-0 ml-auto flex justify-center items-center">
+						<Badge variant={"outline"} className="px-1">
+							{getVietnameseOrderStatus(order.status)}
+						</Badge>
+					</div>
 				</div>
 			))}
 			<div className="sticky bottom-0 pt-10">
