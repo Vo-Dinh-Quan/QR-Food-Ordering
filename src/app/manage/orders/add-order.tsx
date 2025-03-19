@@ -25,7 +25,7 @@ export default function AddOrder() {
   const [selectedGuest, setSelectedGuest] = useState<GetListGuestsResType['data'][0] | null>(null)
   const [isNewGuest, setIsNewGuest] = useState(true)
   const [orders, setOrders] = useState<CreateOrdersBodyType['orders']>([])
-  const dishes: DishListResType['data'] = []
+  const dishes: DishListResType['data'] = [];
 
   const totalPrice = useMemo(() => {
     return dishes.reduce((result, dish) => {

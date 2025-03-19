@@ -1,5 +1,6 @@
 'use client'
 
+// Import các hook, hàm và component cần thiết từ thư viện tanstack/react-table và các component UI đã định nghĩa
 import {
   ColumnFiltersState,
   SortingState,
@@ -35,71 +36,136 @@ import TableSkeleton from '@/app/manage/orders/table-skeleton'
 import { Toaster } from '@/components/ui/sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
 
+// Tạo context để chia sẻ dữ liệu và hàm giữa các component trong bảng đơn hàng
 export const OrderTableContext = createContext({
+  // Hàm để cập nhật id đơn hàng cần chỉnh sửa
   setOrderIdEdit: (value: number | undefined) => {},
+  // Giá trị id đơn hàng hiện tại cần chỉnh sửa
   orderIdEdit: undefined as number | undefined,
+  // Hàm để thay đổi trạng thái của đơn hàng (với dish cụ thể và số lượng)
   changeStatus: (payload: {
     orderId: number
     dishId: number
     status: (typeof OrderStatusValues)[number]
     quantity: number
   }) => {},
+  // Dữ liệu đơn hàng được group theo GuestID
   orderObjectByGuestId: {} as OrderObjectByGuestID
 })
 
+// Định nghĩa type cho object đếm số lượng theo trạng thái đơn hàng
+// StatusCountObject sẽ là một đối tượng mà các key là các giá trị của OrderStatusValues và mỗi key đó sẽ có giá trị là một số (number).
 export type StatusCountObject = Record<(typeof OrderStatusValues)[number], number>
+
+// Định nghĩa type cho các số liệu thống kê của đơn hàng
 export type Statics = {
   status: StatusCountObject
   table: Record<number, Record<number, StatusCountObject>>
 }
+// ví dụ về Statics
+  /*
+  const status = {
+  pending: 5,
+  confirmed: 10,
+  cancelled: 2,
+}
+ */
+/*
+const table = {
+  1: { // Bàn số 1
+    101: { pending: 2, confirmed: 1, cancelled: 0 }, // Khách/mã nhóm 101
+    102: { pending: 3, confirmed: 0, cancelled: 0 }  // Khách/mã nhóm 102
+  },
+  2: { // Bàn số 2
+    201: { pending: 1, confirmed: 4, cancelled: 0 }
+  }
+} */
+
+// Định nghĩa type cho object đơn hàng theo GuestID - nó là 1 object có key là guestId và value là 1 mảng các object đơn hàng
 export type OrderObjectByGuestID = Record<number, GetOrdersResType['data']>
+
+// Định nghĩa type cho object phục vụ khách theo số bàn - nó là 1 object có key là số bàn và value là 1 object chứa các guest
 export type ServingGuestByTableNumber = Record<number, OrderObjectByGuestID>
 
+// Đặt hằng số kích thước trang mặc định
 const PAGE_SIZE = 10
+// Khởi tạo ngày bắt đầu và kết thúc mặc định theo ngày hiện tại
 const initFromDate = startOfDay(new Date())
 const initToDate = endOfDay(new Date())
+
+// Component chính hiển thị bảng đơn hàng
 export default function OrderTable() {
+  // Lấy tham số truy vấn từ URL (ví dụ: ?page=2)
   const searchParam = useSearchParams()
+
+  // State để điều khiển mở/đóng bộ lọc trạng thái đơn hàng
   const [openStatusFilter, setOpenStatusFilter] = useState(false)
+  // State cho ngày bắt đầu lọc
   const [fromDate, setFromDate] = useState(initFromDate)
+  // State cho ngày kết thúc lọc
   const [toDate, setToDate] = useState(initToDate)
+
+  // Lấy số trang hiện tại từ URL, nếu không có thì mặc định là 1
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
-  const pageIndex = page - 1
+  const pageIndex = page - 1 // chuyển đổi sang chỉ số bắt đầu từ 0
+
+  // State lưu id đơn hàng cần chỉnh sửa (khi người dùng click vào sửa đơn hàng)
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>()
+  // Giả sử orderList và tableList sẽ được fetch từ API hoặc service sau này
   const orderList: any = []
   const tableList: any = []
+  // Sắp xếp danh sách bàn theo số bàn tăng dần
   const tableListSortedByNumber = tableList.sort((a: any, b: any) => a.number - b.number)
+
+  // Các state liên quan đến bộ lọc, sắp xếp, ẩn/hiện cột và chọn hàng của bảng
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+
+  // State quản lý phân trang cho bảng (số trang và kích thước trang)
   const [pagination, setPagination] = useState({
-    pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
-    pageSize: PAGE_SIZE //default page size
+    pageIndex, // Giá trị ban đầu của trang (được lấy từ URL)
+    pageSize: PAGE_SIZE // Số lượng bản ghi hiển thị trên mỗi trang
   })
 
+  // Gọi service để lấy dữ liệu thống kê đơn hàng và phân nhóm đơn hàng theo khách hàng
   const { statics, orderObjectByGuestId, servingGuestByTableNumber } = useOrderService(orderList)
 
+  // Hàm xử lý thay đổi trạng thái đơn hàng
   const changeStatus = async (body: {
     orderId: number
     dishId: number
     status: (typeof OrderStatusValues)[number]
     quantity: number
-  }) => {}
+  }) => {
+    // TODO: Triển khai xử lý thay đổi trạng thái đơn hàng (gọi API, xử lý lỗi, cập nhật UI,...)
+  }
 
+  // Khởi tạo bảng đơn hàng sử dụng hook useReactTable của tanstack/react-table
   const table = useReactTable({
-    data: orderList,
-    columns: orderTableColumns,
+    data: orderList, // Dữ liệu đơn hàng
+    columns: orderTableColumns, // Các cột được định nghĩa ở file order-table-columns
+    // Thiết lập các hàm callback cập nhật state khi có thay đổi
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    // Lấy các row model cơ bản của bảng
     getCoreRowModel: getCoreRowModel(),
+    // Hỗ trợ phân trang
     getPaginationRowModel: getPaginationRowModel(),
+    // Hỗ trợ sắp xếp
     getSortedRowModel: getSortedRowModel(),
+    // Hỗ trợ lọc dữ liệu theo cột
     getFilteredRowModel: getFilteredRowModel(),
+    // Callback thay đổi hiển thị các cột
     onColumnVisibilityChange: setColumnVisibility,
+    // Callback thay đổi chọn hàng
     onRowSelectionChange: setRowSelection,
+    // Callback thay đổi phân trang
     onPaginationChange: setPagination,
+    // Không reset lại trang khi dữ liệu thay đổi
     autoResetPageIndex: false,
+    // State quản lý các thao tác của bảng
     state: {
       sorting,
       columnFilters,
@@ -109,6 +175,7 @@ export default function OrderTable() {
     }
   })
 
+  // useEffect cập nhật lại trạng thái phân trang mỗi khi pageIndex thay đổi
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -116,13 +183,16 @@ export default function OrderTable() {
     })
   }, [table, pageIndex])
 
+  // Hàm reset bộ lọc ngày về giá trị mặc định ban đầu
   const resetDateFilter = () => {
     setFromDate(initFromDate)
     setToDate(initToDate)
   }
 
   return (
+    // Sử dụng Suspense để hỗ trợ lazy loading cho các component con
     <Suspense>
+      {/* Cung cấp context cho các component con trong bảng */}
       <OrderTableContext.Provider
         value={{
           orderIdEdit,
@@ -132,19 +202,26 @@ export default function OrderTable() {
         }}
       >
         <div className='w-full'>
+          {/* Component EditOrder để chỉnh sửa đơn hàng; id và hàm setId được truyền qua context */}
           <EditOrder id={orderIdEdit} setId={setOrderIdEdit} onSubmitSuccess={() => {}} />
-          <div className=' flex items-center'>
+
+          {/* Phần header chứa bộ lọc theo ngày và nút tạo đơn hàng */}
+          <div className='flex items-center'>
             <div className='flex flex-wrap gap-2'>
+              {/* Bộ lọc "Từ ngày" */}
               <div className='flex items-center'>
                 <span className='mr-2'>Từ</span>
                 <Input
                   type='datetime-local'
                   placeholder='Từ ngày'
                   className='text-sm'
+                  // Định dạng giá trị ngày thành dạng datetime-local
                   value={format(fromDate, 'yyyy-MM-dd HH:mm').replace(' ', 'T')}
+                  // Cập nhật state fromDate khi người dùng thay đổi
                   onChange={(event) => setFromDate(new Date(event.target.value))}
                 />
               </div>
+              {/* Bộ lọc "Đến ngày" */}
               <div className='flex items-center'>
                 <span className='mr-2'>Đến</span>
                 <Input
@@ -154,27 +231,36 @@ export default function OrderTable() {
                   onChange={(event) => setToDate(new Date(event.target.value))}
                 />
               </div>
+              {/* Nút reset bộ lọc ngày về mặc định */}
               <Button className='' variant={'outline'} onClick={resetDateFilter}>
                 Reset
               </Button>
             </div>
+            {/* Nút thêm đơn hàng, căn lề phải */}
             <div className='ml-auto'>
               <AddOrder />
             </div>
           </div>
+
+          {/* Phần bộ lọc bổ sung cho tên khách và số bàn */}
           <div className='flex flex-wrap items-center gap-4 py-4'>
+            {/* Input lọc theo tên khách hàng */}
             <Input
               placeholder='Tên khách'
               value={(table.getColumn('guestName')?.getFilterValue() as string) ?? ''}
+              // Khi thay đổi, cập nhật giá trị filter cho cột 'guestName'
               onChange={(event) => table.getColumn('guestName')?.setFilterValue(event.target.value)}
               className='max-w-[100px]'
             />
+            {/* Input lọc theo số bàn */}
             <Input
               placeholder='Số bàn'
               value={(table.getColumn('tableNumber')?.getFilterValue() as string) ?? ''}
+              // Khi thay đổi, cập nhật giá trị filter cho cột 'tableNumber'
               onChange={(event) => table.getColumn('tableNumber')?.setFilterValue(event.target.value)}
               className='max-w-[80px]'
             />
+            {/* Bộ lọc theo trạng thái đơn hàng sử dụng Popover */}
             <Popover open={openStatusFilter} onOpenChange={setOpenStatusFilter}>
               <PopoverTrigger asChild>
                 <Button
@@ -183,11 +269,13 @@ export default function OrderTable() {
                   aria-expanded={openStatusFilter}
                   className='w-[150px] text-sm justify-between'
                 >
+                  {/* Hiển thị trạng thái hiện tại nếu có filter, ngược lại hiển thị "Trạng thái" */}
                   {table.getColumn('status')?.getFilterValue()
                     ? getVietnameseOrderStatus(
                         table.getColumn('status')?.getFilterValue() as (typeof OrderStatusValues)[number]
                       )
                     : 'Trạng thái'}
+                  {/* Icon chỉ báo cho phép sắp xếp */}
                   <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                 </Button>
               </PopoverTrigger>
@@ -195,19 +283,23 @@ export default function OrderTable() {
                 <Command>
                   <CommandGroup>
                     <CommandList>
+                      {/* Lặp qua các giá trị trạng thái đơn hàng để hiển thị danh sách lựa chọn */}
                       {OrderStatusValues.map((status) => (
                         <CommandItem
                           key={status}
                           value={status}
                           onSelect={(currentValue) => {
+                            // Cập nhật filter trạng thái: nếu trạng thái được chọn trùng với giá trị hiện tại thì reset filter
                             table
                               .getColumn('status')
                               ?.setFilterValue(
                                 currentValue === table.getColumn('status')?.getFilterValue() ? '' : currentValue
                               )
+                            // Đóng Popover sau khi chọn
                             setOpenStatusFilter(false)
                           }}
                         >
+                          {/* Icon Check hiển thị nếu trạng thái hiện tại đang được filter */}
                           <Check
                             className={cn(
                               'mr-2 h-4 w-4',
@@ -223,20 +315,29 @@ export default function OrderTable() {
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* Component hiển thị các số liệu thống kê đơn hàng */}
           <OrderStatics
             statics={statics}
             tableList={tableListSortedByNumber}
             servingGuestByTableNumber={servingGuestByTableNumber}
           />
+          {/* Có thể sử dụng TableSkeleton để hiển thị loading state */}
           {/* <TableSkeleton /> */}
+
+          {/* Bảng đơn hàng hiển thị dữ liệu */}
           <div className='rounded-md border'>
             <Table>
+              {/* Phần header của bảng */}
               <TableHeader>
+                {/* Lặp qua các nhóm header của react-table */}
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
+                    {/* Lặp qua từng header trong nhóm */}
                     {headerGroup.headers.map((header) => {
                       return (
                         <TableHead key={header.id}>
+                          {/* Nếu header không có nội dung, không hiển thị gì; nếu có thì sử dụng flexRender để render nội dung */}
                           {header.isPlaceholder
                             ? null
                             : flexRender(header.column.columnDef.header, header.getContext())}
@@ -246,16 +347,21 @@ export default function OrderTable() {
                   </TableRow>
                 ))}
               </TableHeader>
+              {/* Phần body của bảng */}
               <TableBody>
                 {table.getRowModel().rows?.length ? (
+                  // Nếu có dữ liệu, lặp qua các hàng và hiển thị từng cell
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
+                  // Nếu không có dữ liệu, hiển thị thông báo "No results."
                   <TableRow>
                     <TableCell colSpan={orderTableColumns.length} className='h-24 text-center'>
                       No results.
@@ -265,12 +371,16 @@ export default function OrderTable() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Phần phân trang hiển thị số lượng kết quả và component AutoPagination */}
           <div className='flex items-center justify-end space-x-2 py-4'>
+            {/* Hiển thị số lượng kết quả hiện tại và tổng số kết quả */}
             <div className='text-xs text-muted-foreground py-4 flex-1 '>
               Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{' '}
               <strong>{orderList.length}</strong> kết quả
             </div>
             <div>
+              {/* Component phân trang tự động, chuyển trang dựa trên trạng thái phân trang của bảng */}
               <AutoPagination
                 page={table.getState().pagination.pageIndex + 1}
                 pageSize={table.getPageCount()}
