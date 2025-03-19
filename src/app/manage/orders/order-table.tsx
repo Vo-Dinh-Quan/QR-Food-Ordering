@@ -32,7 +32,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { endOfDay, format, startOfDay } from 'date-fns'
 import TableSkeleton from '@/app/manage/orders/table-skeleton'
-import { toast } from '@/components/ui/sonner'
+import { Toaster } from '@/components/ui/sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
 
 export const OrderTableContext = createContext({
