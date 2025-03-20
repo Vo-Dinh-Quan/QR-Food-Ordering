@@ -17,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { GetOrdersResType, PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import AddOrder from '@/app/manage/orders/add-order'
 import EditOrder from '@/app/manage/orders/edit-order'
-import { createContext, Suspense, useEffect, useMemo, useState } from 'react'
+import { createContext, Suspense, use, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { getVietnameseOrderStatus, handleErrorApi } from '@/lib/utils'
@@ -35,6 +35,8 @@ import { endOfDay, format, startOfDay } from 'date-fns'
 import TableSkeleton from '@/app/manage/orders/table-skeleton'
 import { Toaster } from '@/components/ui/sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
+import { useGetOrderList } from '@/queries/useOrder'
+import { useTableList } from '@/queries/useTable'
 
 // Tạo context để chia sẻ dữ liệu và hàm giữa các component trong bảng đơn hàng
 export const OrderTableContext = createContext({
@@ -112,10 +114,12 @@ export default function OrderTable() {
   // State lưu id đơn hàng cần chỉnh sửa (khi người dùng click vào sửa đơn hàng)
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>()
   // Giả sử orderList và tableList sẽ được fetch từ API hoặc service sau này
-  const orderList: any = []
-  const tableList: any = []
+  const orderListQuery = useGetOrderList({ fromDate, toDate });
+  const orderList = orderListQuery.data?.payload.data ?? [];
+  const tableListQuery = useTableList();
+  const tableList = tableListQuery.data?.payload.data ?? [];
   // Sắp xếp danh sách bàn theo số bàn tăng dần
-  const tableListSortedByNumber = tableList.sort((a: any, b: any) => a.number - b.number)
+  const tableListSortedByNumber = tableList.sort((a, b) => a.number - b.number)
 
   // Các state liên quan đến bộ lọc, sắp xếp, ẩn/hiện cột và chọn hàng của bảng
   const [sorting, setSorting] = useState<SortingState>([])
@@ -323,10 +327,8 @@ export default function OrderTable() {
             servingGuestByTableNumber={servingGuestByTableNumber}
           />
           {/* Có thể sử dụng TableSkeleton để hiển thị loading state */}
-          {/* <TableSkeleton /> */}
-
-          {/* Bảng đơn hàng hiển thị dữ liệu */}
-          <div className='rounded-md border'>
+          {orderListQuery.isPending && <TableSkeleton />}
+          {!orderListQuery.isPending && (<div className='rounded-md border'>
             <Table>
               {/* Phần header của bảng */}
               <TableHeader>
@@ -370,7 +372,10 @@ export default function OrderTable() {
                 )}
               </TableBody>
             </Table>
-          </div>
+          </div>)}
+
+          {/* Bảng đơn hàng hiển thị dữ liệu */}
+
 
           {/* Phần phân trang hiển thị số lượng kết quả và component AutoPagination */}
           <div className='flex items-center justify-end space-x-2 py-4'>
