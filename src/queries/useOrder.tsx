@@ -8,9 +8,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 export const useUpdateOrderMutation = () => {
 	return useMutation({
 		// note: mutationFn là một hàm không thể nhận vào 2 tham số. Nếu muốn truyền vào nhiều tham số thì phải truyền vào dưới dạng object (chat GPT)
-		mutationFn: ({ id, ...body }: UpdateOrderBodyType & { id: number }) =>
-			orderApiRequest.updateOrder(id, body),
+		mutationFn: ({
+			orderId,
+			...body
+		}: UpdateOrderBodyType & { orderId: number }) =>
+			orderApiRequest.updateOrder(orderId, body),
 	});
+	// ở đây ta không dùng queryClient để invalidate vì ta đã xử lý fetch lại với socket.io rồi
 };
 
 export const useGetOrderList = (queryParams: GetOrdersQueryParamsType) => {

@@ -125,8 +125,12 @@ export function DishesDialog({
 		});
 	}, [table]);
 
+	// Điều này có nghĩa rằng, khi gọi hàm onChoose bên trong DishesDialog, nó thực sự đang gọi hàm mà component cha (edit-order.tsx) đã truyền vào.
 	const choose = (dish: DishItem) => {
 		onChoose(dish);
+		// Ở đây, choose nhận vào một đối tượng dish và thực hiện 2 việc:
+		// 1. Gọi Callback: Gọi onChoose(dish) để gửi thông tin món ăn được chọn về component cha.
+		// 2. Đóng Dialog: Đóng dialog sau khi chọn món ăn.
 		setOpen(false);
 	};
 
@@ -135,7 +139,7 @@ export function DishesDialog({
 			<DialogTrigger asChild>
 				<Button variant="outline">Thay đổi</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[600px]">
+			<DialogContent className="sm:max-w-[600px] max-h-full overflow-auto">
 				<DialogHeader>
 					<DialogTitle>Chọn món ăn</DialogTitle>
 				</DialogHeader>
