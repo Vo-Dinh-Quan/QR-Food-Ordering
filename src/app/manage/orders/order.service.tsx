@@ -48,8 +48,6 @@ export const useOrderService = (orderList: GetOrdersResType['data']) => {
     const orderObjectByGuestId: OrderObjectByGuestID = {}
 
     // Khởi tạo object để nhóm các guest theo số bàn.
-    // Mỗi key là số bàn (tableNumber) và giá trị là một object chứa các guest theo guestId,
-    // với mỗi guestId ánh xạ tới mảng đơn hàng của guest đó.
     const guestByTableNumber: ServingGuestByTableNumber = {}
 
     // Duyệt qua từng đơn hàng trong orderList để cập nhật các đối tượng thống kê và nhóm đơn hàng
@@ -103,13 +101,13 @@ export const useOrderService = (orderList: GetOrdersResType['data']) => {
     // Duyệt qua từng bàn có chứa guest trong guestByTableNumber
     for (const tableNumber in guestByTableNumber) {
       // Lấy đối tượng chứa các guest cho số bàn hiện tại
-      const guestObject = guestByTableNumber[tableNumber]
+      const guestsObject = guestByTableNumber[tableNumber]
       // Khởi tạo một object để lưu các guest đang phục vụ cho bàn này
       const servingGuestObject: OrderObjectByGuestID = {}
       // Duyệt qua từng guest trong bàn (key của guestObject chính là guestId)
-      for (const guestId in guestObject) {
+      for (const guestId in guestsObject) {
         // Lấy danh sách đơn hàng của guest hiện tại
-        const guestOrders = guestObject[guestId]
+        const guestOrders = guestsObject[guestId]
         // Kiểm tra xem guest này có đơn hàng nào có trạng thái đang phục vụ hay không.
         // Sử dụng hàm some để kiểm tra nếu có bất kỳ đơn hàng nào có trạng thái nằm trong danh sách [Pending, Processing, Delivered]
         const isServingGuest = guestOrders.some((order) =>

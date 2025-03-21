@@ -32,7 +32,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
       if (filterValue === undefined) return true
       return simpleMatchText(String(row.getValue(columnId)), String(filterValue))
     }
-  },
+  },  
   {
     id: 'guestName',
     header: 'Khách hàng',

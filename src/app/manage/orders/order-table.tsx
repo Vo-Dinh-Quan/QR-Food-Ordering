@@ -37,6 +37,8 @@ import { Toaster } from '@/components/ui/sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
 import { useGetOrderList } from '@/queries/useOrder'
 import { useTableList } from '@/queries/useTable'
+import socket from '@/lib/socket'
+import { toast } from 'sonner'
 
 // Tạo context để chia sẻ dữ liệu và hàm giữa các component trong bảng đơn hàng
 export const OrderTableContext = createContext({
@@ -192,6 +194,44 @@ export default function OrderTable() {
     setFromDate(initFromDate)
     setToDate(initToDate)
   }
+    useEffect(() => {
+      if (socket.connected) {
+        onConnect();
+      }
+      function onConnect() {
+        console.log(socket.id);
+      }
+  
+      function onDisconnect() {
+        console.log("disconnect");
+      }
+  
+      function onUpdateOrder(data: UpdateOrderResType["data"]) {
+        console.log(data);
+        refetch();
+        toast(`Món ${data.dishSnapshot.name} (SL: ${data.quantity}) vừa được cập nhật sang trạng thái ${getVietnameseOrderStatus(data.status)}`, {
+          action: {
+            label: "Ẩn",
+            onClick: () => console.log("Undo"),
+          },
+        });
+      }
+
+      function onNewOrder(data: GuestCreateOrdersResType["data"]) {
+        
+      }
+
+      socket.on("new-order", onNewOrder);
+  
+      socket.on("connect", onConnect);
+      socket.on("disconnect", onDisconnect);
+  
+      return () => {
+        socket.off("connect", onConnect);
+        socket.off("disconnect", onDisconnect);
+        socket.off("update-order", onUpdateOrder);
+      };
+    }, []);
 
   return (
     // Sử dụng Suspense để hỗ trợ lazy loading cho các component con
