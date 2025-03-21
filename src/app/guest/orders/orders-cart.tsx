@@ -6,7 +6,7 @@ import { OrderStatus } from "@/constants/type";
 import socket from "@/lib/socket";
 import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useGuestGetOrderList } from "@/queries/useGuest";
-import { UpdateOrderResType } from "@/schemaValidations/order.schema";
+import { PayGuestOrdersResType, UpdateOrderResType } from "@/schemaValidations/order.schema";
 import Image from "next/image";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
@@ -84,7 +84,23 @@ export default function OrdersCart() {
 				}
 			);
 		}
+
+    function onPayment(data: PayGuestOrdersResType["data"]) {
+      const { guest } = data[0];
+      toast(
+        `${guest?.name} tại bàn ${guest?.tableNumber} đã thanh toán thành công ${data.length} đơn`,
+        {
+          action: {
+            label: "Ẩn",
+            onClick: () => console.log("Undo"),
+          },
+        }
+      );
+      refetch();
+    }
+
 		socket.on("update-order", onUpdateOrder);
+    socket.on("payment", onPayment)
 
 		socket.on("connect", onConnect);
 		socket.on("disconnect", onDisconnect);
@@ -93,6 +109,7 @@ export default function OrdersCart() {
 			socket.off("connect", onConnect);
 			socket.off("disconnect", onDisconnect);
 			socket.off("update-order", onUpdateOrder);
+      socket.off("payment", onPayment);
 		};
 	}, [refetch]);
 

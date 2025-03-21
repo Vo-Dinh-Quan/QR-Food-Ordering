@@ -286,8 +286,23 @@ export default function OrderTable() {
 			refetch();
 		}
 
+    function onPayment(data: PayGuestOrdersResType["data"]) {
+      const { guest } = data[0];
+      toast(
+        `${guest?.name} tại bàn ${guest?.tableNumber} vừa thanh toán ${data.length} đơn`,
+        {
+          action: {
+            label: "Ẩn",
+            onClick: () => console.log("Undo"),
+          },
+        }
+      );
+      refetch();
+    }
+
 		socket.on("update-order", onUpdateOrder);
 		socket.on("new-order", onNewOrder);
+    socket.on("payment", onPayment)
 
 		socket.on("connect", onConnect);
 		socket.on("disconnect", onDisconnect);
@@ -297,6 +312,7 @@ export default function OrderTable() {
 			socket.off("disconnect", onDisconnect);
 			socket.off("update-order", onUpdateOrder);
 			socket.off("new-order", onNewOrder);
+      socket.off("payment", onPayment);
 		};
 	}, [refetchOrderList, fromDate, toDate]);
 

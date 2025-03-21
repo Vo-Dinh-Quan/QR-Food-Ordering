@@ -9,6 +9,8 @@ import { GuestGetOrdersResType } from "@/schemaValidations/guest.schema";
 import {
 	GetOrderDetailResType,
 	GetOrdersQueryParamsType,
+	PayGuestOrdersBodyType,
+	PayGuestOrdersResType,
 	UpdateOrderBodyType,
 	UpdateOrderResType,
 } from "@/schemaValidations/order.schema";
@@ -31,6 +33,7 @@ const orderApiRequest = {
 	// deleteDish: (id: number) => http.delete<DishResType>(`${prefix}/${id}`),
 	getOrderDetail: (id: number) =>
 		http.get<GetOrderDetailResType>(`${prefix}/${id}`),
+  payGuest: (body: PayGuestOrdersBodyType) => http.post<PayGuestOrdersResType>(`${prefix}/pay`, body),
 };
 
 export default orderApiRequest;

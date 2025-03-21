@@ -7,8 +7,10 @@ import {
 	formatDateTimeToLocaleString,
 	formatDateTimeToTimeString,
 	getVietnameseOrderStatus,
+  handleErrorApi,
 } from "@/lib/utils";
-import { GetOrdersResType } from "@/schemaValidations/order.schema";
+import { usePayForGuestMutation } from "@/queries/useOrder";
+import { GetOrdersResType, PayGuestOrdersResType } from "@/schemaValidations/order.schema";
 import Image from "next/image";
 import { Fragment } from "react";
 
@@ -17,10 +19,28 @@ type Orders = GetOrdersResType["data"];
 export default function OrderGuestDetail({
 	guest,
 	orders,
+  onPaySuccess,
 }: {
 	guest: Guest;
 	orders: Orders;
+  onPaySuccess?: (data: PayGuestOrdersResType) => void; // khai báo nó có thể nhận một function trả về void
 }) {
+  const payForGuestMutation = usePayForGuestMutation();
+  const pay = async () => {
+    if (payForGuestMutation.isPending || !guest) return;
+    try {
+      const response = await payForGuestMutation.mutateAsync({ guestId: guest.id });
+      if (onPaySuccess) {
+        onPaySuccess(response.payload); // gọi đến và truyền response.payload vào hàm onPaySuccess
+        // thực tế ở bên order-static.tsx, ta không cần dùng nó thì ở bên đó không cần khai báo tham số nhận vào mà chỉ cần set lại setSelectedTableNumber(0) là đủ
+      }
+    } catch (error) {
+      handleErrorApi({
+        error,
+      })
+    }
+  }
+
 	const ordersFilterToPurchase = guest
 		? orders.filter(
 				(order) =>
@@ -145,7 +165,8 @@ export default function OrderGuestDetail({
 					className="w-full"
 					size={"sm"}
 					variant={"secondary"}
-					disabled={ordersFilterToPurchase.length === 0}>
+					disabled={ordersFilterToPurchase.length === 0} 
+          onClick={pay}>
 					Thanh toán tất cả ({ordersFilterToPurchase.length} đơn)
 				</Button>
 			</div>
