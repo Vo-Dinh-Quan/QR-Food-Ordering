@@ -2,6 +2,7 @@
 
 import { Description } from "@/app/guest/menu/menu-order";
 import { Badge } from "@/components/ui/badge";
+import { OrderStatus } from "@/constants/type";
 import socket from "@/lib/socket";
 import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useGuestGetOrderList } from "@/queries/useGuest";
@@ -14,11 +15,45 @@ export default function OrdersCart() {
 	const { data, refetch } = useGuestGetOrderList();
 	const orders = data?.payload.data || [];
 	console.log(orders);
-	const totalPrice = () => {
-		return orders.reduce((total, order) => {
-			return total + order.dishSnapshot.price * order.quantity;
-		}, 0);
-	};
+	const { waitingForPaying, paid } = orders.reduce(
+		(total, order) => {
+			if (
+				order.status === OrderStatus.Delivered ||
+				order.status === OrderStatus.Processing ||
+				order.status === OrderStatus.Pending
+			) {
+				return {
+					...total,
+					waitingForPaying: {
+						price:
+							total.waitingForPaying.price +
+							order.dishSnapshot.price * order.quantity,
+						quantity: total.waitingForPaying.quantity + order.quantity,
+					},
+				};
+			}
+			if (order.status === OrderStatus.Paid) {
+				return {
+					...total,
+					paid: {
+						price: total.paid.price + order.dishSnapshot.price * order.quantity,
+						quantity: total.paid.quantity + order.quantity,
+					},
+				};
+			}
+			return total;
+		},
+		{
+			waitingForPaying: {
+				price: 0,
+				quantity: 0,
+			},
+			paid: {
+				price: 0,
+				quantity: 0,
+			},
+		}
+	);
 
 	useEffect(() => {
 		if (socket.connected) {
@@ -33,14 +68,21 @@ export default function OrdersCart() {
 		}
 
 		function onUpdateOrder(data: UpdateOrderResType["data"]) {
-      console.log(data);
+			console.log(data);
 			refetch();
-			toast(`Món ${data.dishSnapshot.name} (SL: ${data.quantity}) vừa được cập nhật sang trạng thái ${getVietnameseOrderStatus(data.status)}`, {
-				action: {
-					label: "Ẩn",
-					onClick: () => console.log("Undo"),
-				},
-			});
+			toast(
+				`Món ${data.dishSnapshot.name} (SL: ${
+					data.quantity
+				}) vừa được cập nhật sang trạng thái ${getVietnameseOrderStatus(
+					data.status
+				)}`,
+				{
+					action: {
+						label: "Ẩn",
+						onClick: () => console.log("Undo"),
+					},
+				}
+			);
 		}
 		socket.on("update-order", onUpdateOrder);
 
@@ -88,9 +130,14 @@ export default function OrdersCart() {
 				</div>
 			))}
 			<div className="sticky bottom-0 pt-10">
-				<div className="w-full justify-between flex text-xl font-semibold">
-					<span>Giá tiền · {orders.length} món</span>
-					<span>{formatCurrency(totalPrice())}</span>
+				<div className="w-full justify-between flex text-sm font-semibold">
+					<span>Đơn đã thanh toán · {paid.quantity} món [{formatCurrency(paid.price)}]</span>
+				</div>
+			</div>
+			<div className="sticky ">
+				<div className="w-full justify-between flex text-lg font-semibold">
+					<span>Đơn chưa thanh toán · {waitingForPaying.quantity} món</span>
+					<span>{formatCurrency(waitingForPaying.price)}</span>
 				</div>
 			</div>
 		</>
