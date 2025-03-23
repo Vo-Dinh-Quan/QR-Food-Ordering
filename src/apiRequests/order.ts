@@ -7,6 +7,8 @@ import {
 } from "@/schemaValidations/dish.schema";
 import { GuestGetOrdersResType } from "@/schemaValidations/guest.schema";
 import {
+	CreateOrdersBodyType,
+	CreateOrdersResType,
 	GetOrderDetailResType,
 	GetOrdersQueryParamsType,
 	PayGuestOrdersBodyType,
@@ -19,6 +21,9 @@ import queryString from "query-string";
 const prefix = "/orders";
 
 const orderApiRequest = {
+	createOrders: (body: CreateOrdersBodyType) =>
+		http.post<CreateOrdersResType>(`${prefix}`, body),
+
 	list: (queryParams: GetOrdersQueryParamsType) =>
 		http.get<GuestGetOrdersResType>(
 			`${prefix}?${queryString.stringify({
@@ -33,7 +38,8 @@ const orderApiRequest = {
 	// deleteDish: (id: number) => http.delete<DishResType>(`${prefix}/${id}`),
 	getOrderDetail: (id: number) =>
 		http.get<GetOrderDetailResType>(`${prefix}/${id}`),
-  payGuest: (body: PayGuestOrdersBodyType) => http.post<PayGuestOrdersResType>(`${prefix}/pay`, body),
+	payGuest: (body: PayGuestOrdersBodyType) =>
+		http.post<PayGuestOrdersResType>(`${prefix}/pay`, body),
 };
 
 export default orderApiRequest;

@@ -40,7 +40,14 @@ export const useGetOrderDetail = ({
 };
 
 export const usePayForGuestMutation = () => {
-  return useMutation({
-    mutationFn: (body: PayGuestOrdersBodyType) => orderApiRequest.payGuest(body),
-  })
-}
+	return useMutation({
+		mutationFn: (body: PayGuestOrdersBodyType) =>
+			orderApiRequest.payGuest(body),
+	});
+};
+
+export const useCreateOrderMutation = () => {
+	return useMutation({
+		mutationFn: orderApiRequest.createOrders,
+	});
+};
