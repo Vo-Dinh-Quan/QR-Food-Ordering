@@ -34,12 +34,6 @@ const menuItems = [
     Icon: Salad,
     href: "/manage/dishes",
   },
-
-  {
-    title: "Phân tích",
-    Icon: LineChart,
-    href: "/manage/analytics",
-  },
   {
     title: "Nhân viên",
     Icon: Users2,
