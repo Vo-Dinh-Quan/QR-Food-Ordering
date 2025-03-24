@@ -64,7 +64,7 @@ export const columns: ColumnDef<TableItem>[] = [
 	},
 ];
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 export function TablesDialog({
 	onChoose,
@@ -213,7 +213,13 @@ export function TablesDialog({
 								<AutoPagination
 									page={table.getState().pagination.pageIndex + 1}
 									pageSize={table.getPageCount()}
-									pathname="/manage/Tables"
+									onClick={(pageNumber) => {
+										table.setPagination({
+											pageIndex: pageNumber - 1,
+											pageSize: PAGE_SIZE,
+										});
+									}}
+									isLink={false}
 								/>
 							</div>
 						</div>
