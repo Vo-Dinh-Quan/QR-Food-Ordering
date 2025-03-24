@@ -1,44 +1,50 @@
+import { Role } from "@/constants/type";
 import {
-  Home,
-  LineChart,
-  ShoppingCart,
-  Users2,
-  Salad,
-  Table,
-  LayoutGrid,
+	Home,
+	LineChart,
+	ShoppingCart,
+	Users2,
+	Salad,
+	Table,
+	LayoutGrid,
 } from "lucide-react";
 
 const menuItems = [
-  {
-    title: "Trang chủ",
-    Icon: LayoutGrid,
-    href: "/",
-  },
-  {
-    title: "Dashboard",
-    Icon: Home,
-    href: "/manage/dashboard",
-  },
-  {
-    title: "Đơn hàng",
-    Icon: ShoppingCart,
-    href: "/manage/orders",
-  },
-  {
-    title: "Bàn ăn",
-    Icon: Table,
-    href: "/manage/tables",
-  },
-  {
-    title: "Món ăn",
-    Icon: Salad,
-    href: "/manage/dishes",
-  },
-  {
-    title: "Nhân viên",
-    Icon: Users2,
-    href: "/manage/accounts",
-  },
+	{
+		title: "Trang chủ",
+		Icon: LayoutGrid,
+		href: "/",
+	},
+	{
+		title: "Dashboard",
+		Icon: Home,
+		href: "/manage/dashboard",
+		roles: [Role.Owner, Role.Employee],
+	},
+	{
+		title: "Đơn hàng",
+		Icon: ShoppingCart,
+		href: "/manage/orders",
+		roles: [Role.Owner, Role.Employee],
+	},
+	{
+		title: "Bàn ăn",
+		Icon: Table,
+		href: "/manage/tables",
+		roles: [Role.Owner, Role.Employee],
+	},
+	{
+		title: "Món ăn",
+		Icon: Salad,
+		href: "/manage/dishes",
+		roles: [Role.Owner, Role.Employee],
+	},
+	{
+		title: "Nhân viên",
+		Icon: Users2,
+		href: "/manage/accounts",
+		roles: [Role.Owner],
+	},
 ];
 
 export default menuItems;

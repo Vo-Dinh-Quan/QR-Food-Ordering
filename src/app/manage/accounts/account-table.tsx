@@ -139,6 +139,11 @@ export const columns: ColumnDef<AccountType>[] = [
 		},
 	},
 	{
+		accessorKey: "role", // Cột hiển thị tên nhân viên
+		header: "Vai trò",
+		cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
+	},
+	{
 		id: "actions", // Cột hành động không dựa trên dữ liệu cụ thể trong đối tượng Account
 		enableHiding: false, // Không cho phép ẩn cột này
 		cell: function Actions({ row }) {
