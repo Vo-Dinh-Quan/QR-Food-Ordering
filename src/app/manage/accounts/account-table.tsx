@@ -394,58 +394,6 @@ export default function AccountTable() {
 						</div>
 					)}
 					{/* Hiển thị bảng trong một container có viền và bo góc */}
-					<div className="rounded-md border">
-						<Table>
-							<TableHeader>
-								{/* Duyệt qua các header group được tạo bởi react-table */}
-								{table.getHeaderGroups().map((headerGroup) => (
-									<TableRow key={headerGroup.id}>
-										{headerGroup.headers.map((header) => {
-											return (
-												<TableHead key={header.id}>
-													{/* Nếu header không phải là placeholder, render nội dung header */}
-													{header.isPlaceholder
-														? null
-														: flexRender(
-																header.column.columnDef.header,
-																header.getContext()
-														  )}
-												</TableHead>
-											);
-										})}
-									</TableRow>
-								))}
-							</TableHeader>
-							<TableBody>
-								{/* Kiểm tra nếu có dữ liệu để hiển thị */}
-								{table.getRowModel().rows?.length ? (
-									table.getRowModel().rows.map((row) => (
-										<TableRow
-											key={row.id}
-											data-state={row.getIsSelected() && "selected"}>
-											{row.getVisibleCells().map((cell) => (
-												<TableCell key={cell.id}>
-													{flexRender(
-														cell.column.columnDef.cell,
-														cell.getContext()
-													)}
-												</TableCell>
-											))}
-										</TableRow>
-									))
-								) : (
-									// Nếu không có dữ liệu, hiển thị dòng thông báo
-									<TableRow>
-										<TableCell
-											colSpan={columns.length}
-											className="h-24 text-center">
-											No results.
-										</TableCell>
-									</TableRow>
-								)}
-							</TableBody>
-						</Table>
-					</div>
 					{/* Phần điều khiển phân trang */}
 					<div className="flex items-center justify-end space-x-2 py-4">
 						<div className="text-xs text-muted-foreground py-4 flex-1 ">
