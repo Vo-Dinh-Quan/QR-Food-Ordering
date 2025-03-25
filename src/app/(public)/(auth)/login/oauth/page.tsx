@@ -38,14 +38,19 @@ export default function OAuthPage() {
 				count.current++;
 			}
 		} else {
-			console.log("message", message);
-			toast("Có lỗi xảy ra", {
-				description: message,
-				action: {
-					label: "Ẩn",
-					onClick: () => console.log("Undo"),
-				},
-			});
+			if (count.current === 0) {
+				console.log("message", message); // ta không cần clearTimeout vì ta dùng nó ngay lập tức và chỉ cho nó chạy 1 lần duy nhất
+				setTimeout(() => {
+					toast("Có lỗi xảy ra", {
+						description: message,
+						action: {
+							label: "Ẩn",
+							onClick: () => console.log("Undo"),
+						},
+					});
+				});
+				router.push("/login");
+			}
 		}
 	}, [accessToken, refreshToken, setRole, router, message, mutateAsync]);
 	return <div>Đang xử lý...</div>;
