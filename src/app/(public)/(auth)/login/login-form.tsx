@@ -18,6 +18,8 @@ import { useLoginMutation } from "@/queries/useAuth";
 import { toast } from "sonner";
 import {
 	decodeToken,
+	generateSocketInstance,
+	getAccessTokenFromLocalStorage,
 	handleErrorApi,
 	removeTokensFromLocalStorage,
 } from "@/lib/utils";
@@ -26,6 +28,7 @@ import { useEffect } from "react";
 import { useAppContext } from "@/components/app-provider";
 import envConfig from "@/config";
 import Link from "next/link";
+import { io } from "socket.io-client";
 
 const getOauthGoogleUrl = () => {
 	const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -49,6 +52,7 @@ export default function LoginForm() {
 	const loginMutation = useLoginMutation(); // cú pháp này có nghĩa là sử dụng hàm useLoginMutation từ file useAuth.tsx
 	const searchParams = useSearchParams();
 	const clearTokens = searchParams.get("clearTokens");
+	const { socket, setSocket } = useAppContext();
 	// cấu hình form sử dụng react-hook-form và zodResolver để validate form
 	const form = useForm<LoginBodyType>({
 		resolver: zodResolver(LoginBody), // react-hook-form sử dụng zodResolver để validate dữ liệu dựa trên LoginBoy.
@@ -82,6 +86,7 @@ export default function LoginForm() {
 				},
 			});
 			setRole(response.payload.data.account.role);
+			setSocket(generateSocketInstance(response.payload.data.accessToken));
 			router.push("/manage/dashboard");
 		} catch (error: any) {
 			handleErrorApi({

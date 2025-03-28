@@ -78,7 +78,7 @@ It can also happen if the client has a browser extension installed which messes 
 // hướng giải quyết: sử dụng useEffect để check trạng thái đăng nhập của user (theo gợi ý của nextjs)
 // cách này sẽ giúp tránh lỗi hydration failed và warning Content did not match
 export default function NavItems({ className }: { className?: string }) {
-	const { role, setRole } = useAppContext();
+	const { role, setRole, disconnectSocket } = useAppContext();
 	const logoutMutation = useLogoutMutation();
 	const guestLogoutMutation = useGuestLogoutMutation();
 	const router = useRouter();
@@ -93,6 +93,7 @@ export default function NavItems({ className }: { className?: string }) {
 			} else {
 				await logoutMutation.mutateAsync();
 			}
+			disconnectSocket();
 			// sau phần này, trong http.ts nó sẽ có phần xóa localStorage cho mình rồi
 			router.push("/");
 			setRole(undefined);
@@ -128,9 +129,7 @@ export default function NavItems({ className }: { className?: string }) {
 			{role && (
 				<AlertDialog>
 					<AlertDialogTrigger asChild>
-						<div className={cn(className, "cursor-pointer")}>
-							Đăng xuất
-						</div>
+						<div className={cn(className, "cursor-pointer")}>Đăng xuất</div>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
 						<AlertDialogHeader>

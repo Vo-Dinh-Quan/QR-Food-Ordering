@@ -14,6 +14,7 @@ const menuItems = [
 		title: "Trang chủ",
 		Icon: LayoutGrid,
 		href: "/",
+		roles: [Role.Owner, Role.Employee],
 	},
 	{
 		title: "Dashboard",

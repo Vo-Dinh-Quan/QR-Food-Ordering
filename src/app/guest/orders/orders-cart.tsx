@@ -1,17 +1,22 @@
 "use client";
 
 import { Description } from "@/app/guest/menu/menu-order";
+import { useAppContext } from "@/components/app-provider";
 import { Badge } from "@/components/ui/badge";
 import { OrderStatus } from "@/constants/type";
-import socket from "@/lib/socket";
+// import socket from "@/lib/socket";
 import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useGuestGetOrderList } from "@/queries/useGuest";
-import { PayGuestOrdersResType, UpdateOrderResType } from "@/schemaValidations/order.schema";
+import {
+	PayGuestOrdersResType,
+	UpdateOrderResType,
+} from "@/schemaValidations/order.schema";
 import Image from "next/image";
 import React, { useEffect } from "react";
 import { toast } from "sonner";
 
 export default function OrdersCart() {
+	const { socket } = useAppContext();
 	const { data, refetch } = useGuestGetOrderList();
 	const orders = data?.payload.data || [];
 	console.log(orders);
@@ -56,11 +61,11 @@ export default function OrdersCart() {
 	);
 
 	useEffect(() => {
-		if (socket.connected) {
+		if (socket?.connected) {
 			onConnect();
 		}
 		function onConnect() {
-			console.log(socket.id);
+			console.log("socket:", socket?.id);
 		}
 
 		function onDisconnect() {
@@ -85,33 +90,33 @@ export default function OrdersCart() {
 			);
 		}
 
-    function onPayment(data: PayGuestOrdersResType["data"]) {
-      const { guest } = data[0];
-      toast(
-        `${guest?.name} tại bàn ${guest?.tableNumber} đã thanh toán thành công ${data.length} đơn`,
-        {
-          action: {
-            label: "Ẩn",
-            onClick: () => console.log("Undo"),
-          },
-        }
-      );
-      refetch();
-    }
+		function onPayment(data: PayGuestOrdersResType["data"]) {
+			const { guest } = data[0];
+			toast(
+				`${guest?.name} tại bàn ${guest?.tableNumber} đã thanh toán thành công ${data.length} đơn`,
+				{
+					action: {
+						label: "Ẩn",
+						onClick: () => console.log("Undo"),
+					},
+				}
+			);
+			refetch();
+		}
 
-		socket.on("update-order", onUpdateOrder);
-    socket.on("payment", onPayment)
+		socket?.on("update-order", onUpdateOrder);
+		socket?.on("payment", onPayment);
 
-		socket.on("connect", onConnect);
-		socket.on("disconnect", onDisconnect);
+		socket?.on("connect", onConnect);
+		socket?.on("disconnect", onDisconnect);
 
 		return () => {
-			socket.off("connect", onConnect);
-			socket.off("disconnect", onDisconnect);
-			socket.off("update-order", onUpdateOrder);
-      socket.off("payment", onPayment);
+			socket?.off("connect", onConnect);
+			socket?.off("disconnect", onDisconnect);
+			socket?.off("update-order", onUpdateOrder);
+			socket?.off("payment", onPayment);
 		};
-	}, [refetch]);
+	}, [refetch, socket]);
 
 	return (
 		<>
@@ -148,7 +153,10 @@ export default function OrdersCart() {
 			))}
 			<div className="sticky bottom-0 pt-10">
 				<div className="w-full justify-between flex text-sm font-semibold">
-					<span>Đơn đã thanh toán · {paid.quantity} món [{formatCurrency(paid.price)}]</span>
+					<span>
+						Đơn đã thanh toán · {paid.quantity} món [
+						{formatCurrency(paid.price)}]
+					</span>
 				</div>
 			</div>
 			<div className="sticky ">

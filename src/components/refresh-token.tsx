@@ -1,6 +1,6 @@
 "use-client";
 
-import socket from "@/lib/socket";
+import { useAppContext } from "@/components/app-provider";
 import { checkAndRefreshToken } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -11,55 +11,53 @@ const UNAUTHENTICATED_PAGES = ["/login", "/logout", "refresh-token"];
 export default function RefreshToken() {
 	const router = useRouter();
 	const pathname = usePathname();
+	const { socket, disconnectSocket } = useAppContext();
 	// console.log("pathname", pathname);
 	useEffect(() => {
 		if (UNAUTHENTICATED_PAGES.includes(pathname)) return;
 		let interval: any = null;
 		// phải gọi lần đầu tiên, vì interval sẽ chạy sau thời gian TIMEOUT
-		const onRefreshToken = (force?: boolean) =>  {
-      console.log("refresh token");
-      checkAndRefreshToken({
-        onError: () => {
-          clearInterval(interval);
-        },
-        force,
-      });
-    }
-      
+		const onRefreshToken = (force?: boolean) => {
+			// console.log("refresh token");
+			checkAndRefreshToken({
+				onError: () => {
+					clearInterval(interval);
+					disconnectSocket();
+				},
+				force,
+			});
+		};
 
-    onRefreshToken();
+		onRefreshToken();
 		// TIMEOUT interval phải bé hơn thời gian hết hạn của access token
 		// vd: thời gian sống của access token là 10s thì TIMEOUT out là 1s
 		const TIMEOUT = 1000;
-		interval = setInterval(
-      onRefreshToken,
-			TIMEOUT
-		);
-		if (socket.connected) {
+		interval = setInterval(onRefreshToken, TIMEOUT);
+		if (socket?.connected) {
 			onConnect();
 		}
 		function onConnect() {
-			console.log(socket.id);
+			console.log(socket?.id);
 		}
 
 		function onDisconnect() {
 			console.log("disconnect");
 		}
 
-    function onRefreshTokenSocket() {
-      onRefreshToken(true);
-    }
+		function onRefreshTokenSocket() {
+			onRefreshToken(true);
+		}
 
-		socket.on("connect", onConnect);
-		socket.on("disconnect", onDisconnect);
-    socket.on("refresh-token", onRefreshTokenSocket)
+		socket?.on("connect", onConnect);
+		socket?.on("disconnect", onDisconnect);
+		socket?.on("refresh-token", onRefreshTokenSocket);
 		return () => {
-			socket.off("connect", onConnect);
-			socket.off("disconnect", onDisconnect);
-      socket.off("refresh-token", onRefreshTokenSocket)
+			socket?.off("connect", onConnect);
+			socket?.off("disconnect", onDisconnect);
+			socket?.off("refresh-token", onRefreshTokenSocket);
 			clearInterval(interval);
 		}; // clear interval khi component unmount
-	}, [pathname, router]);
+	}, [pathname, router, disconnectSocket]);
 	return null;
 }
 

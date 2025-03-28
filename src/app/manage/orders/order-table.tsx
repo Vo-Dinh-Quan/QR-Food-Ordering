@@ -64,8 +64,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
 import { useGetOrderList, useUpdateOrderMutation } from "@/queries/useOrder";
 import { useTableList } from "@/queries/useTable";
-import socket from "@/lib/socket";
+// import socket from "@/lib/socket";
 import { toast } from "sonner";
+import { useAppContext } from "@/components/app-provider";
 
 // Tạo context để chia sẻ dữ liệu và hàm giữa các component trong bảng đơn hàng
 export const OrderTableContext = createContext({
@@ -129,6 +130,7 @@ const initToDate = endOfDay(new Date());
 
 // Component chính hiển thị bảng đơn hàng
 export default function OrderTable() {
+	const { socket } = useAppContext();
 	// Lấy tham số truy vấn từ URL (ví dụ: ?page=2)
 	const searchParam = useSearchParams();
 
@@ -236,11 +238,11 @@ export default function OrderTable() {
 		setToDate(initToDate);
 	};
 	useEffect(() => {
-		if (socket.connected) {
+		if (socket?.connected) {
 			onConnect();
 		}
 		function onConnect() {
-			console.log(socket.id);
+			console.log(socket?.id);
 		}
 
 		function onDisconnect() {
@@ -300,22 +302,21 @@ export default function OrderTable() {
 			refetch();
 		}
 
-		socket.on("update-order", onUpdateOrder);
-		socket.on("new-order", onNewOrder);
-		socket.on("payment", onPayment);
+		socket?.on("update-order", onUpdateOrder);
+		socket?.on("new-order", onNewOrder);
+		socket?.on("payment", onPayment);
 
-		socket.on("connect", onConnect);
-		socket.on("disconnect", onDisconnect);
+		socket?.on("connect", onConnect);
+		socket?.on("disconnect", onDisconnect);
 
 		return () => {
-			socket.off("connect", onConnect);
-			socket.off("disconnect", onDisconnect);
-			socket.off("update-order", onUpdateOrder);
-			socket.off("new-order", onNewOrder);
-			socket.off("payment", onPayment);
+			socket?.off("connect", onConnect);
+			socket?.off("disconnect", onDisconnect);
+			socket?.off("update-order", onUpdateOrder);
+			socket?.off("new-order", onNewOrder);
+			socket?.off("paym123ent", onPayment);
 		};
-	}, [refetchOrderList, fromDate, toDate]);
-
+	}, [refetchOrderList, fromDate, toDate, socket]);
 	return (
 		// Sử dụng Suspense để hỗ trợ lazy loading cho các component con
 		<Suspense>
