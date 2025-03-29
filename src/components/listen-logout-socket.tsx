@@ -1,4 +1,4 @@
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { usePathname, useRouter } from "next/navigation";
@@ -7,7 +7,9 @@ import React, { useEffect } from "react";
 const UNAUTHENTICATED_PAGES = ["/login", "/logout", "refresh-token"];
 export default function ListenLogoutSocKet() {
 	const { isPending, mutateAsync } = useLogoutMutation(); // với component này ta cần lấy trực tiếp isPending và mutateAsync thay vì object. Bởi vì mỗi lần re-render nó sẽ tạo ra 1 instance mới, khiến useEffect bị gọi lại liên tục
-	const { socket, setRole, disconnectSocket } = useAppContext(); // lấy socket từ context
+	const socket = useAppStore((state) => state.socket);
+	const setRole = useAppStore((state) => state.setRole);
+	const disconnectSocket = useAppStore((state) => state.disconnectSocket);
 
 	const router = useRouter();
 	const pathname = usePathname();

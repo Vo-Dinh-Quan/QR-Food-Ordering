@@ -1,7 +1,7 @@
 "use client";
 
 import { Description } from "@/app/guest/menu/menu-order";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { Badge } from "@/components/ui/badge";
 import { OrderStatus } from "@/constants/type";
 // import socket from "@/lib/socket";
@@ -16,7 +16,7 @@ import React, { useEffect } from "react";
 import { toast } from "sonner";
 
 export default function OrdersCart() {
-	const { socket } = useAppContext();
+	const socket = useAppStore((state) => state.socket);
 	const { data, refetch } = useGuestGetOrderList();
 	const orders = data?.payload.data || [];
 	console.log(orders);

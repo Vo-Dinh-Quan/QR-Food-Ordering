@@ -66,7 +66,7 @@ import { useGetOrderList, useUpdateOrderMutation } from "@/queries/useOrder";
 import { useTableList } from "@/queries/useTable";
 // import socket from "@/lib/socket";
 import { toast } from "sonner";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 
 // Tạo context để chia sẻ dữ liệu và hàm giữa các component trong bảng đơn hàng
 export const OrderTableContext = createContext({
@@ -130,7 +130,7 @@ const initToDate = endOfDay(new Date());
 
 // Component chính hiển thị bảng đơn hàng
 export default function OrderTable() {
-	const { socket } = useAppContext();
+	const socket = useAppStore((state) => state.socket);
 	// Lấy tham số truy vấn từ URL (ví dụ: ?page=2)
 	const searchParam = useSearchParams();
 

@@ -13,12 +13,12 @@ import {
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useGuestLoginMutation } from "@/queries/useGuest";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { generateSocketInstance, handleErrorApi } from "@/lib/utils";
 
 export default function GuestLoginForm() {
-	const { setRole } = useAppContext();
-	const { setSocket } = useAppContext();
+	const setRole = useAppStore((state) => state.setRole); // lấy setRole từ context
+	const setSocket = useAppStore((state) => state.setSocket);
 	const searchParams = useSearchParams();
 	const params = useParams();
 	// với url là http://localhost:3000/tables/1?token=8931e14820384e2f99bb400022692a6c thì searchParams.get("token") sẽ trả về "8931e14820384e2f99bb400022692a6c" và params sẽ trả về { number: "1" }

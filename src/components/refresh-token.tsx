@@ -1,6 +1,6 @@
 "use-client";
 
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { checkAndRefreshToken } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -11,7 +11,8 @@ const UNAUTHENTICATED_PAGES = ["/login", "/logout", "refresh-token"];
 export default function RefreshToken() {
 	const router = useRouter();
 	const pathname = usePathname();
-	const { socket, disconnectSocket } = useAppContext();
+	const socket = useAppStore((state) => state.socket);
+	const disconnectSocket = useAppStore((state) => state.disconnectSocket);
 	// console.log("pathname", pathname);
 	useEffect(() => {
 		if (UNAUTHENTICATED_PAGES.includes(pathname)) return;

@@ -1,7 +1,7 @@
 // giải thích 1 chút là: thằng nav-item này được import vào layout public nên những page nào nằm trong thư mục public thì đều bị ảnh hưởng chuyển sang dynamic-rendering khi nav-item có sử dụng cookie từ next/headers, vậy nên chúng ta sẽ chuyển nó sang 'useClient' để dùng localStorage thay vì cookie
 "use client";
 
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { Role } from "@/constants/type";
 import { cn, handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
@@ -78,7 +78,10 @@ It can also happen if the client has a browser extension installed which messes 
 // hướng giải quyết: sử dụng useEffect để check trạng thái đăng nhập của user (theo gợi ý của nextjs)
 // cách này sẽ giúp tránh lỗi hydration failed và warning Content did not match
 export default function NavItems({ className }: { className?: string }) {
-	const { role, setRole, disconnectSocket } = useAppContext();
+	const role = useAppStore((state) => state.role); // lấy role từ store
+	console.log("role", role);
+	const setRole = useAppStore((state) => state.setRole); // lấy setRole từ store
+	const disconnectSocket = useAppStore((state) => state.disconnectSocket); // lấy disconnectSocket từ store
 	const logoutMutation = useLogoutMutation();
 	const guestLogoutMutation = useGuestLogoutMutation();
 	const router = useRouter();

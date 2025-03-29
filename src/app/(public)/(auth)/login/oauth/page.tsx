@@ -1,5 +1,5 @@
 "use client";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { decodeToken } from "@/lib/utils";
 import { useSetTokenToCookieMutation } from "@/queries/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 function OAuthContent() {
 	const { mutateAsync, isPending } = useSetTokenToCookieMutation();
-	const { setRole } = useAppContext();
+	const setRole = useAppStore((state) => state.setRole);
 	const searchParams = useSearchParams();
 	const accessToken = searchParams.get("accessToken");
 	const refreshToken = searchParams.get("refreshToken");
