@@ -3,10 +3,10 @@ import { useAppContext } from "@/components/app-provider";
 import { decodeToken } from "@/lib/utils";
 import { useSetTokenToCookieMutation } from "@/queries/useAuth";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useRef } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-export default function OAuthPage() {
+function OAuthContent() {
 	const { mutateAsync, isPending } = useSetTokenToCookieMutation();
 	const { setRole } = useAppContext();
 	const searchParams = useSearchParams();
@@ -54,4 +54,12 @@ export default function OAuthPage() {
 		}
 	}, [accessToken, refreshToken, setRole, router, message, mutateAsync]);
 	return <div>Đang xử lý...</div>;
+}
+
+export default function OAuthPage() {
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<OAuthContent />
+		</Suspense>
+	);
 }
