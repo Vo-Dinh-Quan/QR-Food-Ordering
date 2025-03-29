@@ -78,30 +78,30 @@ export default async function Home() {
 					</h2>
 
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-						{dishList.map((dish) => (
-							<div key={dish.id} className="m-4 rounded-xl overflow-hidden">
-								<Image
-									src={dish.image}
-									width={400}
-									height={400}
-									alt={dish.name}
-									className="w-full h-[250px] object-cover mb-4 hover:scale-105 transition transform duration-300"
-								/>
-								<h3 className="text-xl font-semibold mb-2">{dish.name}</h3>
-								<p className="text-sm mb-2">{dish.description}</p>
-								<p className="text-lg font-bold mb-2">
-									{formatCurrency(dish.price)}
-								</p>
-								<div className="flex items-center">
-									<span className="text-yellow-400 text-xl mr-1">★</span>
-									<span className="text-yellow-400 text-xl mr-1">★</span>
-									<span className="text-yellow-400 text-xl mr-1">★</span>
-									<span className="text-yellow-400 text-xl mr-1">★</span>
-									<span className="text-yellow-400 text-xl mr-1">★</span>
-									<span className="text-sm text-gray-600 ml-2">5.0</span>
-								</div>
-							</div>
-						))}
+            {dishList.slice(0, 4).map((dish) => (
+              <div key={dish.id} className="m-4 rounded-xl overflow-hidden">
+                <Image
+                  src={dish.image}
+                  width={400}
+                  height={400}
+                  alt={dish.name}
+                  className="w-full h-[250px] object-cover mb-4 hover:scale-105 transition transform duration-300"
+                />
+                <h3 className="text-xl font-semibold mb-2">{dish.name}</h3>
+                <p className="text-sm mb-2">{dish.description}</p>
+                <p className="text-lg font-bold mb-2">
+                  {formatCurrency(dish.price)}
+                </p>
+                <div className="flex items-center">
+                  <span className="text-yellow-400 text-xl mr-1">★</span>
+                  <span className="text-yellow-400 text-xl mr-1">★</span>
+                  <span className="text-yellow-400 text-xl mr-1">★</span>
+                  <span className="text-yellow-400 text-xl mr-1">★</span>
+                  <span className="text-yellow-400 text-xl mr-1">★</span>
+                  <span className="text-sm text-gray-600 ml-2">5.0</span>
+                </div>
+              </div>
+            ))}
 					</div>
 					<div className="text-center mt-10">
 						<Button>Khám phá thực đơn của chúng tôi</Button>

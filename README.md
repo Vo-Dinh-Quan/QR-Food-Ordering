@@ -1,4 +1,4 @@
-<!--
+
 # **Restaurant Management System with QR Code Ordering**
 
 
@@ -20,7 +20,7 @@
 ![Thumbnail](./thumbnail-QR-food-ordering.png)
 
 
-### **Backend**
+<!-- ### **Backend**
 1. **Fastify** – *A fast and low-overhead web framework for Node.js, optimized for efficient handling of HTTP requests.*
 2. **Prisma** – *An ORM tool that simplifies database interactions through type-safe queries.*
 3. **JWT (JSON Web Tokens)** – *Provides secure, stateless authentication for user sessions and API interactions.*
@@ -29,7 +29,7 @@
  -->
 
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<!-- This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
@@ -64,4 +64,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details. -->
