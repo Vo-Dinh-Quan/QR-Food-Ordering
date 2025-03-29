@@ -22,25 +22,22 @@ export default async function Home() {
 			<section className=" flex flex-col-reverse md:flex-row items-center justify-center gap-8">
 				{/* Text Content (40%) */}
 				<div className="w-full md:w-2/5 relative">
-					<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-						Chúng tôi không nấu ăn, chúng tôi tạo ra cảm xúc của bạn! 🍕
+					<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight ">
+						Bin Restaurant 🍕 Nơi mang lại hương vị hoàng gia!
 					</h1>
 					<p className="leading-7 [&:not(:first-child)]:mt-6">
-						Món ăn Việt Nam khiến người ta liên tưởng đến những bữa tối thịnh
-						soạn của gia đình. Vì vậy, bạn có thể muốn định vị nhà hàng của mình
-						là nơi đón tiếp cả gia đình.
+						Không chỉ là một nhà hàng, mà là biểu tượng của sự tinh tế. Chúng
+						tôi mang đến những kiệt tác ẩm thực, nơi hương vị thượng lưu gặp gỡ
+						không gian xa hoa, tạo nên trải nghiệm đẳng cấp dành riêng cho những
+						thực khách sành điệu nhất.
 					</p>
 				</div>
 
 				{/* Hero Image */}
 				<div className="w-full md:w-3/5 flex justify-center lg:justify-end relative">
 					<div className="relative inline-block">
-						<h2 className="absolute top-[0%] left-[0%] scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0 bg-gradient-to-r from-red-500 via-orange-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-purple-500 text-transparent bg-clip-text">
-							Bin Restaurant - Nơi mang lại hương vị hoàng gia
-						</h2>
-
 						<Image
-							src="/bin.png"
+							src="/bin1.png"
 							alt="Hero Dish"
 							width={500}
 							height={500}
@@ -53,21 +50,21 @@ export default async function Home() {
 							alt="Mini Banner 1"
 							width={100}
 							height={100}
-							className="rounded-full object-cover absolute top-[15%] left-[-15%] hover:scale-105 transition transform duration-300 hidden xl:block" // Hidden on mobile
+							className="rounded-full object-cover absolute top-[15%] left-[-15%] hover:scale-150 transition transform duration-300 hidden xl:block" // Hidden on mobile
 						/>
 						<Image
 							src="/banner3.png"
 							alt="Mini Banner 2"
 							width={100}
 							height={100}
-							className="rounded-full object-cover absolute top-[50%] left-[-20%] translate-y-[-50%] hover:scale-105 transition transform duration-300 hidden xl:block" // Hidden on mobile
+							className="rounded-full object-cover absolute top-[50%] left-[-20%] translate-y-[-50%] hover:scale-150 transition transform duration-300 hidden xl:block" // Hidden on mobile
 						/>
 						<Image
 							src="/banner4.png"
 							alt="Mini Banner 3"
 							width={80}
 							height={80}
-							className="rounded-full object-cover absolute bottom-[15%] left-[-15%] hover:scale-105 transition transform duration-300 hidden xl:block" // Hidden on mobile
+							className="rounded-full object-cover absolute bottom-[15%] left-[-15%] hover:scale-150 transition transform duration-300 hidden xl:block" // Hidden on mobile
 						/>
 					</div>
 				</div>

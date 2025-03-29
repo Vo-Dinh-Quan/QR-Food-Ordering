@@ -57,7 +57,7 @@ export default function RefreshToken() {
 			socket?.off("refresh-token", onRefreshTokenSocket);
 			clearInterval(interval);
 		}; // clear interval khi component unmount
-	}, [pathname, router, disconnectSocket]);
+	}, [pathname, router, disconnectSocket, socket]); // thêm socket vào dependency array để khi socket thay đổi thì useEffect sẽ chạy lại
 	return null;
 }
 

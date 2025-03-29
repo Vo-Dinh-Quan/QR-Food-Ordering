@@ -1,4 +1,5 @@
 "use client";
+import ListenLogoutSocKet from "@/components/listen-logout-socket";
 import RefreshToken from "@/components/refresh-token";
 import {
 	decodeToken,
@@ -21,6 +22,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useRef,
 	useState,
 } from "react";
 import type { Socket } from "socket.io-client";
@@ -54,20 +56,18 @@ export default function AppProvider({
 }) {
 	const [role, setRoleState] = useState<RoleType | undefined>();
 	const [socket, setSocket] = useState<Socket | undefined>();
+	const count = useRef(0);
 	useEffect(() => {
-		// chạy useEffect lần đầu để check access token
-		const accessToken = getAccessTokenFromLocalStorage();
-		if (accessToken) {
-			const role = decodeToken(accessToken).role;
-			setRoleState(role);
-			setSocket(generateSocketInstance(accessToken));
-		}
-		return () => {
-			// cleanup
-			if (socket) {
-				disconnectSocket();
+		if (count.current === 0) {
+			// chạy useEffect lần đầu để check access token
+			const accessToken = getAccessTokenFromLocalStorage();
+			if (accessToken) {
+				const role = decodeToken(accessToken).role;
+				setRoleState(role);
+				setSocket(generateSocketInstance(accessToken));
 			}
-		};
+			count.current++;
+		}
 	}, []);
 
 	const disconnectSocket = useCallback(() => {
@@ -88,6 +88,7 @@ export default function AppProvider({
 			value={{ role, setRole, isAuth, socket, setSocket, disconnectSocket }}>
 			<QueryClientProvider client={queryClient}>
 				<RefreshToken />
+				<ListenLogoutSocKet />
 				{children}
 				<ReactQueryDevtools initialIsOpen={false} />
 			</QueryClientProvider>
