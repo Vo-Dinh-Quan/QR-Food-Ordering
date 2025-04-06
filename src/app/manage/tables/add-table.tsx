@@ -73,7 +73,8 @@ export default function AddTable() {
   };
   return (
     <Dialog
-      onOpenChange={(value) => { // Hàm callback này sẽ được gọi khi dialog mở hoặc đóng
+      onOpenChange={(value) => {
+        // Hàm callback này sẽ được gọi khi dialog mở hoặc đóng
         // trạng thái mở là true, đóng là false
         if (!value) {
           reset(); // Gọi hàm reset() khi dialog đóng
@@ -85,9 +86,7 @@ export default function AddTable() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            Thêm bàn
-          </span>
+          <span className="">Thêm bàn</span>
         </Button>
       </DialogTrigger>
       <DialogContent

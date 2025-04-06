@@ -329,7 +329,7 @@ export default function AccountTable() {
             setEmployeeDelete={setEmployeeDelete}
           />
           {/* Phần tìm kiếm (filter) theo email */}
-          <div className="flex items-center py-4">
+          <div className="md:flex items-center py-4">
             <Input
               placeholder="Filter emails..."
               // Lấy giá trị filter của cột email từ bảng, nếu không có thì trả về chuỗi rỗng
@@ -340,7 +340,7 @@ export default function AccountTable() {
               onChange={(event) =>
                 table.getColumn("email")?.setFilterValue(event.target.value)
               }
-              className="max-w-sm"
+              className="max-w-sm mb-4 md:mb-0"
             />
             {/* Nút thêm nhân viên, nằm bên phải */}
             <div className="ml-auto flex items-center gap-2">

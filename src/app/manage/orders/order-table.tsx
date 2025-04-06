@@ -337,15 +337,14 @@ export default function OrderTable() {
           />
 
           {/* Phần header chứa bộ lọc theo ngày và nút tạo đơn hàng */}
-          <div className="flex items-center">
-            <div className="flex flex-wrap gap-2">
+          <div className="md:flex items-center ">
+            <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
               {/* Bộ lọc "Từ ngày" */}
               <div className="flex items-center">
                 <span className="mr-2">Từ</span>
                 <Input
                   type="datetime-local"
                   placeholder="Từ ngày"
-                  className="text-sm"
                   // Định dạng giá trị ngày thành dạng datetime-local
                   value={format(fromDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                   // Cập nhật state fromDate khi người dùng thay đổi
@@ -379,7 +378,7 @@ export default function OrderTable() {
           </div>
 
           {/* Phần bộ lọc bổ sung cho tên khách và số bàn */}
-          <div className="flex flex-wrap items-center gap-4 py-4">
+          <div className="flex flex-wrap justify-between md:justify-start items-center gap-4 py-4">
             {/* Input lọc theo tên khách hàng */}
             <Input
               placeholder="Tên khách"
@@ -390,7 +389,7 @@ export default function OrderTable() {
               onChange={(event) =>
                 table.getColumn("guestName")?.setFilterValue(event.target.value)
               }
-              className="max-w-[100px]"
+              className="max-w-[120px]"
             />
             {/* Input lọc theo số bàn */}
             <Input
@@ -486,10 +485,9 @@ export default function OrderTable() {
                     <TableRow key={headerGroup.id}>
                       {headerGroup.headers.map((header) => {
                         // Kiểm tra nếu header thuộc các cột cần ẩn trên mobile
-                        const hideOnMobile = [
-                          "orderHandlerName",
-                          "createdAt",
-                        ].includes(header.column.id);
+                        const hideOnMobile = ["orderHandlerName"].includes(
+                          header.column.id
+                        );
                         return (
                           <TableHead
                             key={header.id}
@@ -517,10 +515,9 @@ export default function OrderTable() {
                         data-state={row.getIsSelected() && "selected"}>
                         {row.getVisibleCells().map((cell) => {
                           // Kiểm tra nếu cell thuộc các cột cần ẩn trên mobile
-                          const hideOnMobile = [
-                            "orderHandlerName",
-                            "createdAt",
-                          ].includes(cell.column.id);
+                          const hideOnMobile = ["orderHandlerName"].includes(
+                            cell.column.id
+                          );
                           return (
                             <TableCell
                               key={cell.id}

@@ -1,60 +1,64 @@
 "use client";
+
 import { getTableLink } from "@/lib/utils";
 import QRCode from "qrcode";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function QRCodeTable({
   token,
   tableNumber,
-  width = 200,
 }: {
   token: string;
   tableNumber: number;
-  width?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [qrWidth, setQrWidth] = useState(200); // Default desktop size
+
+  // Responsive width detection
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setQrWidth(100); // mobile width
+      } else {
+        setQrWidth(200); // desktop width
+      }
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize); // Listen on resize
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
-    // hiện tại thư viện QR Code sẽ vẽ lên thẻ Canvas
-    // Bây giờ: Chúng ta sẽ tạo 1 cái thẻ canvas ảo để thư viện QRCode nó vẽ QR lên trên đó. Và chúng ta sẽ edit thẻ canvas thật.
-    // Cuối cùng thì chúng ta sẽ đưa cái thẻ canvas ảo chứa QRCode ở trên vào thẻ canvas thật.
     const canvas = canvasRef.current!;
-    canvas.height = width + 40;
-    canvas.width = width;
-    const canvasContext = canvas.getContext("2d")!; // 2d là kiểu vẽ 2 chiều
-    canvasContext.fillStyle = "#fff";
-    canvasContext.fillRect(0, 0, canvas.width, canvas.height); // tô màu trắng cho canvas từ tọa độ (0,0) đến (canvas.width, canvas.height)
-    canvasContext.font = "bold 15px Inter";
+    canvas.height = qrWidth + 40;
+    canvas.width = qrWidth;
 
-    canvasContext.textAlign = "center";
-    canvasContext.fillStyle = "#000";
-    canvasContext.fillText(
-      `Bàn số ${tableNumber}`,
-      canvas.width / 2,
-      canvas.width + 15
-    );
-    canvasContext.fillText(
-      `Quét mã QR để gọi món`,
-      canvas.width / 2,
-      canvas.width + 30
-    );
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = "bold 15px Inter";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#000";
+    ctx.fillText(`Bàn số ${tableNumber}`, canvas.width / 2, qrWidth + 15);
+    ctx.fillText(`Quét mã QR để gọi món`, canvas.width / 2, qrWidth + 30);
+
     const virtualCanvas = document.createElement("canvas");
 
     QRCode.toCanvas(
       virtualCanvas,
-      getTableLink({
-        token: token,
-        tableNumber: tableNumber,
-      }),{
-        width: width,
-        margin: 2,
-      },
-      function (error) {
+      getTableLink({ token, tableNumber }),
+      { width: qrWidth, margin: 2 },
+      (error) => {
         if (error) console.error(error);
-        canvasContext.drawImage(virtualCanvas, 0, 0, width, width);
+        ctx.drawImage(virtualCanvas, 0, 0, qrWidth, qrWidth);
       }
     );
-  }, [token, tableNumber, width]);
+  }, [token, tableNumber, qrWidth]);
 
-  return <canvas ref={canvasRef} className="font-semibold"/>;
+  return <canvas ref={canvasRef} className="font-semibold" />;
 }
+
+// note:  Dùng hook useMediaQuery để tự động đổi width tối ưu responsive trên mobile

@@ -95,7 +95,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
     id: "dishName",
     header: "Món ăn",
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-[300px]">
         <Popover>
           <PopoverTrigger asChild>
             <Image
@@ -130,9 +130,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
 
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="hidden md:inline">
-              {row.original.dishSnapshot.name}
-            </span>
+            <span>{row.original.dishSnapshot.name}</span>
             <Badge className="px-1" variant={"secondary"}>
               x{row.original.quantity}
             </Badge>
@@ -193,9 +191,9 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: () => <div className="hidden md:table-cell">Tạo/Cập nhật</div>,
+    header: () => <div>Tạo/Cập nhật</div>,
     cell: ({ row }) => (
-      <div className="hidden md:table-cell space-y-2 text-sm">
+      <div className="space-y-2 text-sm">
         <div className="flex items-center space-x-4">
           {formatDateTimeToLocaleString(row.getValue("createdAt"))}
         </div>

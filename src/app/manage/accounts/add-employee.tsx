@@ -121,7 +121,7 @@ export default function AddEmployee() {
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
           {/* Sử dụng sr-only để ẩn text khỏi giao diện nhưng vẫn cho screen reader */}
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+          <span className="">
             Tạo tài khoản
           </span>
         </Button>

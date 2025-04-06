@@ -101,7 +101,9 @@ export const columns: ColumnDef<DishItem>[] = [
   {
     accessorKey: "name",
     header: "Tên",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize w-[200px]">{row.getValue("name")}</div>
+    ),
   },
   {
     accessorKey: "price",
@@ -275,7 +277,7 @@ export default function DishTable() {
             dishDelete={dishDelete}
             setDishDelete={setDishDelete}
           />
-          <div className="flex items-center py-4">
+          <div className="md:flex md:items-center py-4">
             <Input
               placeholder="Lọc tên"
               value={
@@ -284,7 +286,7 @@ export default function DishTable() {
               onChange={(event) =>
                 table.getColumn("name")?.setFilterValue(event.target.value)
               }
-              className="max-w-sm"
+              className="max-w-sm mb-4 md:mb-0"
             />
             <div className="ml-auto flex items-center gap-2">
               <AddDish />
