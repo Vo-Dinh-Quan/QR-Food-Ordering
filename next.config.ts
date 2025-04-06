@@ -4,14 +4,12 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "103.140.249.51",
-        port: "4000",
-        pathname: "/**",
-        search: "",
+        protocol: "https", // Chuyển từ "http" sang "https"
+        hostname: "api.binrestaurant.io.vn", // Thay IP cũ bằng tên miền backend
+        pathname: "/**", // Giữ nguyên để tải tất cả các đường dẫn con
       },
       {
-        hostname: "unsplash.com",
+        hostname: "unsplash.com", // Giữ nếu bạn vẫn dùng hình ảnh từ đây
         pathname: "/**",
       },
     ],
