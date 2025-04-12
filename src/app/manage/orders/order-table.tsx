@@ -125,7 +125,9 @@ export type ServingGuestByTableNumber = Record<number, OrderObjectByGuestID>;
 // Đặt hằng số kích thước trang mặc định
 const PAGE_SIZE = 10;
 // Khởi tạo ngày bắt đầu và kết thúc mặc định theo ngày hiện tại
-const initFromDate = startOfDay(new Date());
+const initFromDate = startOfDay(
+  new Date(new Date().setMonth(new Date().getMonth() - 2))
+);
 const initToDate = endOfDay(new Date());
 
 // Component chính hiển thị bảng đơn hàng

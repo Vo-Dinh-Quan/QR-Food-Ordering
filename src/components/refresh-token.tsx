@@ -9,57 +9,58 @@ import { useEffect } from "react";
 const UNAUTHENTICATED_PAGES = ["/login", "/logout", "refresh-token"];
 
 export default function RefreshToken() {
-	const router = useRouter();
-	const pathname = usePathname();
-	const socket = useAppStore((state) => state.socket);
-	const disconnectSocket = useAppStore((state) => state.disconnectSocket);
-	// console.log("pathname", pathname);
-	useEffect(() => {
-		if (UNAUTHENTICATED_PAGES.includes(pathname)) return;
-		let interval: any = null;
-		// phải gọi lần đầu tiên, vì interval sẽ chạy sau thời gian TIMEOUT
-		const onRefreshToken = (force?: boolean) => {
-			// console.log("refresh token");
-			checkAndRefreshToken({
-				onError: () => {
-					clearInterval(interval);
-					disconnectSocket();
-				},
-				force,
-			});
-		};
+  const router = useRouter();
+  const pathname = usePathname();
+  const socket = useAppStore((state) => state.socket);
+  const disconnectSocket = useAppStore((state) => state.disconnectSocket);
+  // console.log("pathname", pathname);
+  useEffect(() => {
+    if (UNAUTHENTICATED_PAGES.includes(pathname)) return;
+    let interval: any = null;
+    // phải gọi lần đầu tiên, vì interval sẽ chạy sau thời gian TIMEOUT
+    const onRefreshToken = (force?: boolean) => {
+      // console.log("refresh token");
+      checkAndRefreshToken({
+        onError: () => {
+          clearInterval(interval); // Khi gọi API refresh token mà bị lỗi thì clear interval
+          disconnectSocket();
+        },
+        force,
+      });
+    };
 
-		onRefreshToken();
-		// TIMEOUT interval phải bé hơn thời gian hết hạn của access token
-		// vd: thời gian sống của access token là 10s thì TIMEOUT out là 1s
-		const TIMEOUT = 1000;
-		interval = setInterval(onRefreshToken, TIMEOUT);
-		if (socket?.connected) {
-			onConnect();
-		}
-		function onConnect() {
-			console.log(socket?.id);
-		}
+    onRefreshToken(); // bởi vì interval sẽ chạy sau TIMEOUT, nên phải gọi lần đầu tiên để gọi trước
 
-		function onDisconnect() {
-			console.log("disconnect");
-		}
+    // TIMEOUT interval phải bé hơn thời gian hết hạn của access token
+    // vd: thời gian sống của access token là 10s thì TIMEOUT out là 1s
+    const TIMEOUT = 1000;
+    interval = setInterval(onRefreshToken, TIMEOUT);
+    if (socket?.connected) {
+      onConnect();
+    }
+    function onConnect() {
+      console.log(socket?.id);
+    }
 
-		function onRefreshTokenSocket() {
-			onRefreshToken(true);
-		}
+    function onDisconnect() {
+      console.log("disconnect");
+    }
 
-		socket?.on("connect", onConnect);
-		socket?.on("disconnect", onDisconnect);
-		socket?.on("refresh-token", onRefreshTokenSocket);
-		return () => {
-			socket?.off("connect", onConnect);
-			socket?.off("disconnect", onDisconnect);
-			socket?.off("refresh-token", onRefreshTokenSocket);
-			clearInterval(interval);
-		}; // clear interval khi component unmount
-	}, [pathname, router, disconnectSocket, socket]); // thêm socket vào dependency array để khi socket thay đổi thì useEffect sẽ chạy lại
-	return null;
+    function onRefreshTokenSocket() {
+      onRefreshToken(true);
+    }
+
+    socket?.on("connect", onConnect);
+    socket?.on("disconnect", onDisconnect);
+    socket?.on("refresh-token", onRefreshTokenSocket);
+    return () => {
+      socket?.off("connect", onConnect);
+      socket?.off("disconnect", onDisconnect);
+      socket?.off("refresh-token", onRefreshTokenSocket);
+      clearInterval(interval);
+    }; // clear interval khi component unmount
+  }, [pathname, router, disconnectSocket, socket]); // thêm socket vào dependency array để khi socket thay đổi thì useEffect sẽ chạy lại
+  return null;
 }
 
 // vấn đề gặp phải: duplicate gọi API refresh token liên tục quá nhanh, dẫn đến cả 2 request đều dùng chung token để gửi đi, dẫn đến lỗi 401

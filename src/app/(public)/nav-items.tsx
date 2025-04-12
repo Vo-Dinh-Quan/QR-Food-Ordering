@@ -78,10 +78,9 @@ It can also happen if the client has a browser extension installed which messes 
 // hướng giải quyết: sử dụng useEffect để check trạng thái đăng nhập của user (theo gợi ý của nextjs)
 // cách này sẽ giúp tránh lỗi hydration failed và warning Content did not match
 export default function NavItems({ className }: { className?: string }) {
-	const role = useAppStore((state) => state.role); // lấy role từ store
-	console.log("role", role);
-	const setRole = useAppStore((state) => state.setRole); // lấy setRole từ store
-	const disconnectSocket = useAppStore((state) => state.disconnectSocket); // lấy disconnectSocket từ store
+	const role = useAppStore((state) => state.role); 
+	const setRole = useAppStore((state) => state.setRole); 
+	const disconnectSocket = useAppStore((state) => state.disconnectSocket); 
 	const logoutMutation = useLogoutMutation();
 	const guestLogoutMutation = useGuestLogoutMutation();
 	const router = useRouter();

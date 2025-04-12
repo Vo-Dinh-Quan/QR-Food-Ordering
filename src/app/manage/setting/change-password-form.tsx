@@ -54,8 +54,7 @@ export default function ChangePasswordForm() {
         onSubmit={form.handleSubmit(onSubmit, (e) => {
           console.log(e);
         })}
-        onReset={reset}
-        >
+        onReset={reset}>
         <Card className="overflow-hidden" x-chunk="dashboard-07-chunk-4">
           <CardHeader>
             <CardTitle>Đổi mật khẩu</CardTitle>
