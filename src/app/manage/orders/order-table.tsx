@@ -1,6 +1,5 @@
 "use client";
 
-// Import các hook, hàm và component cần thiết từ thư viện tanstack/react-table và các component UI đã định nghĩa
 import {
   ColumnFiltersState,
   SortingState,
@@ -64,11 +63,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
 import { useGetOrderList, useUpdateOrderMutation } from "@/queries/useOrder";
 import { useTableList } from "@/queries/useTable";
-// import socket from "@/lib/socket";
 import { toast } from "sonner";
 import { useAppStore } from "@/components/app-provider";
 
-// Tạo context để chia sẻ dữ liệu và hàm giữa các component trong bảng đơn hàng
 export const OrderTableContext = createContext({
   // Hàm để cập nhật id đơn hàng cần chỉnh sửa
   setOrderIdEdit: (value: number | undefined) => {},

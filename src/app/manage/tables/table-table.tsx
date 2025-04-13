@@ -64,6 +64,7 @@ import QRCodeTable from "@/components/qrcode-table";
 import { toast } from "sonner";
 import TableSkeleton from "@/app/manage/orders/table-skeleton";
 
+// type table items
 type TableItem = TableListResType["data"][0];
 
 const TableTableContext = createContext<{
