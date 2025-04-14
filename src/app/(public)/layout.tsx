@@ -12,7 +12,13 @@ import {
 import DarkModeToggle from "@/components/dark-mode-toggle";
 import NavItems from "@/app/(public)/nav-items";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({
+  children,
+  modal,
+}: {
+  children: React.ReactNode;
+  modal: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-screen w-full flex-col relative">
       <header className="sticky top-0 z-20 grid grid-cols-3 items-center border-b bg-background px-4 md:px-6 h-16">
@@ -82,6 +88,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         {children}
+        {modal}
       </main>
     </div>
   );
