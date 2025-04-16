@@ -1,4 +1,4 @@
-// app/(public)/dishes/[id]/page.tsx
+// app/(public)/dishes/[slug]/page.tsx
 import dishApiRequest from "@/apiRequests/dish";
 import DishDetail from "@/app/(public)/dishes/[slug]/dish-detail";
 import { baseOpenGraph } from "@/app/shared-metadata";
@@ -6,12 +6,12 @@ import envConfig from "@/config";
 import { getIdFromSlugUrl, wrapServerApi } from "@/lib/utils";
 import { Metadata } from "next";
 
-type Props = { params: { slug: string } };
+type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await wrapServerApi(() =>
-    dishApiRequest.getDish(Number(params.slug))
-  );
+  const resolvedParams = await params;
+  const id = getIdFromSlugUrl(resolvedParams.slug);
+  const data = await wrapServerApi(() => dishApiRequest.getDish(Number(id)));
   const dish = data?.payload?.data;
   const url = envConfig.NEXT_PUBLIC_API_URL + "/dishes/" + dish?.id;
 
@@ -50,7 +50,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DishPage({ params }: Props) {
-  const id = getIdFromSlugUrl(params.slug);
+  const resolvedParams = await params;
+  const id = getIdFromSlugUrl(resolvedParams.slug);
   const data = await wrapServerApi(() => dishApiRequest.getDish(Number(id)));
   const dish = data?.payload?.data;
   return <DishDetail dish={dish} />;

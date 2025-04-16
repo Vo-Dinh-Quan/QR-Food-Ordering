@@ -1,4 +1,4 @@
-"use-client";
+"use client";
 
 import { useAppStore } from "@/components/app-provider";
 import { checkAndRefreshToken } from "@/lib/utils";
