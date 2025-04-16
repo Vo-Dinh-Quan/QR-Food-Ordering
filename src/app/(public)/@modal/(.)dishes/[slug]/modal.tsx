@@ -17,9 +17,9 @@ export default function Modal({ children }: { children: React.ReactNode }) {
       }}>
       <DialogContent className="w-full max-w-3xl p-4 sm:p-6 lg:p-8">
         <DialogHeader>
-            <DialogTitle className="text-lg font-semibold sm:text-xl lg:text-2xl">
+          <DialogTitle className="text-lg font-semibold sm:text-xl lg:text-2xl">
             Chi tiết món ăn
-            </DialogTitle>
+          </DialogTitle>
         </DialogHeader>
         <div className="overflow-auto max-h-[80vh]">{children}</div>
       </DialogContent>

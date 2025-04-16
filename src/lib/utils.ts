@@ -12,6 +12,7 @@ import guestApiRequest from "@/apiRequests/guest";
 import { format } from "date-fns";
 import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react";
 import { io } from "socket.io-client";
+import slugify from "slugify";
 
 /**
  * Hàm cn:
@@ -21,7 +22,7 @@ import { io } from "socket.io-client";
  * @returns Một chuỗi class CSS đã được gộp lại.
  */
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -35,34 +36,34 @@ export function cn(...inputs: ClassValue[]) {
  * @param duration (Tùy chọn) Thời gian hiển thị thông báo toast, mặc định là 5000ms.
  */
 export const handleErrorApi = ({
-	error,
-	setError,
-	duration,
+  error,
+  setError,
+  duration,
 }: {
-	error: any;
-	setError?: UseFormSetError<any>;
-	duration?: number;
+  error: any;
+  setError?: UseFormSetError<any>;
+  duration?: number;
 }) => {
-	// Kiểm tra nếu lỗi là instance của EntityError và hàm setError có sẵn (nghĩa là đang sử dụng form)
-	if (error instanceof EntityError && setError) {
-		// Nếu nhận được lỗi 422, lặp qua từng lỗi và gọi setError để hiển thị thông báo lỗi ở trường tương ứng
-		error.payload.errors.forEach((item) => {
-			setError(item.field, {
-				type: "server",
-				message: item.message,
-			});
-		});
-	} else {
-		// Nếu không phải lỗi từ EntityError, hiển thị toast thông báo lỗi tổng quát
-		toast("Lỗi", {
-			description: error?.payload?.message ?? "Lỗi không xác định",
-			action: {
-				label: "Ẩn",
-				onClick: () => console.log("Lỗi"),
-			},
-			duration: duration ?? 5000, // Thời gian hiển thị toast (mặc định 5000ms)
-		});
-	}
+  // Kiểm tra nếu lỗi là instance của EntityError và hàm setError có sẵn (nghĩa là đang sử dụng form)
+  if (error instanceof EntityError && setError) {
+    // Nếu nhận được lỗi 422, lặp qua từng lỗi và gọi setError để hiển thị thông báo lỗi ở trường tương ứng
+    error.payload.errors.forEach((item) => {
+      setError(item.field, {
+        type: "server",
+        message: item.message,
+      });
+    });
+  } else {
+    // Nếu không phải lỗi từ EntityError, hiển thị toast thông báo lỗi tổng quát
+    toast("Lỗi", {
+      description: error?.payload?.message ?? "Lỗi không xác định",
+      action: {
+        label: "Ẩn",
+        onClick: () => console.log("Lỗi"),
+      },
+      duration: duration ?? 5000, // Thời gian hiển thị toast (mặc định 5000ms)
+    });
+  }
 };
 
 /**
@@ -73,7 +74,7 @@ export const handleErrorApi = ({
  * @returns Chuỗi path đã được loại bỏ ký tự '/' đầu tiên (nếu có).
  */
 export const normalizePath = (path: string) => {
-	return path.startsWith("/") ? path.slice(1) : path;
+  return path.startsWith("/") ? path.slice(1) : path;
 };
 
 /**
@@ -85,7 +86,7 @@ export const normalizePath = (path: string) => {
  * @returns Payload của token dưới dạng đối tượng.
  */
 export const decodeJWT = <Payload = any>(token: string) => {
-	return jwt.decode(token) as Payload;
+  return jwt.decode(token) as Payload;
 };
 
 // Biến isBrowser dùng để kiểm tra xem mã có đang chạy trong môi trường trình duyệt không
@@ -99,7 +100,7 @@ const isBrowser = typeof window !== "undefined";
  * @returns accessToken dưới dạng chuỗi hoặc null nếu không tìm thấy hoặc không phải môi trường browser.
  */
 export const getAccessTokenFromLocalStorage = () =>
-	isBrowser ? localStorage.getItem("accessToken") : null;
+  isBrowser ? localStorage.getItem("accessToken") : null;
 
 /**
  * Hàm getRefreshTokenFromLocalStorage:
@@ -108,7 +109,7 @@ export const getAccessTokenFromLocalStorage = () =>
  * @returns refreshToken dưới dạng chuỗi hoặc null nếu không tìm thấy hoặc không phải môi trường browser.
  */
 export const getRefreshTokenFromLocalStorage = () =>
-	isBrowser ? localStorage.getItem("refreshToken") : null;
+  isBrowser ? localStorage.getItem("refreshToken") : null;
 
 /**
  * Hàm setAccessTokenToLocalStorage:
@@ -117,7 +118,7 @@ export const getRefreshTokenFromLocalStorage = () =>
  * @param accessToken Chuỗi accessToken cần lưu.
  */
 export const setAccessTokenToLocalStorage = (accessToken: string) =>
-	isBrowser ? localStorage.setItem("accessToken", accessToken) : null;
+  isBrowser ? localStorage.setItem("accessToken", accessToken) : null;
 
 /**
  * Hàm setRefreshTokenToLocalStorage:
@@ -126,15 +127,15 @@ export const setAccessTokenToLocalStorage = (accessToken: string) =>
  * @param refreshToken Chuỗi refreshToken cần lưu.
  */
 export const setRefreshTokenToLocalStorage = (refreshToken: string) =>
-	isBrowser ? localStorage.setItem("refreshToken", refreshToken) : null;
+  isBrowser ? localStorage.setItem("refreshToken", refreshToken) : null;
 
 /**
  * Hàm removeTokensFromLocalStorage:
  * - Xóa accessToken và refreshToken khỏi localStorage.
  */
 export const removeTokensFromLocalStorage = () => {
-	localStorage.removeItem("accessToken");
-	localStorage.removeItem("refreshToken");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
 };
 
 /**
@@ -147,54 +148,54 @@ export const removeTokensFromLocalStorage = () => {
  * @param params (Tùy chọn) Object chứa các hàm callback onError và onSuccess.
  */
 export const checkAndRefreshToken = async (params?: {
-	onError?: () => void;
-	onSuccess?: () => void;
-	force?: boolean;
+  onError?: () => void;
+  onSuccess?: () => void;
+  force?: boolean;
 }) => {
-	// Lấy accessToken và refreshToken từ localStorage
-	const accessToken = localStorage.getItem("accessToken");
-	const refreshToken = localStorage.getItem("refreshToken");
+  // Lấy accessToken và refreshToken từ localStorage
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
-	// Nếu chưa đăng nhập (không có token nào) thì không thực hiện tiếp
-	if (!accessToken || !refreshToken) return;
+  // Nếu chưa đăng nhập (không có token nào) thì không thực hiện tiếp
+  if (!accessToken || !refreshToken) return;
 
-	// Giải mã token để lấy thông tin thời gian hết hạn (exp) và thời gian tạo (iat)
-	const decodedAccessToken = decodeToken(accessToken);
-	const decodedRefreshToken = decodeToken(refreshToken);
-	// Lấy thời gian hiện tại tính theo giây (epoch time), trừ 1 giây để khắc phục chênh lệch nhỏ
-	const now = new Date().getTime() / 1000 - 1;
+  // Giải mã token để lấy thông tin thời gian hết hạn (exp) và thời gian tạo (iat)
+  const decodedAccessToken = decodeToken(accessToken);
+  const decodedRefreshToken = decodeToken(refreshToken);
+  // Lấy thời gian hiện tại tính theo giây (epoch time), trừ 1 giây để khắc phục chênh lệch nhỏ
+  const now = new Date().getTime() / 1000 - 1;
 
-	// Nếu refresh token đã hết hạn, xóa token khỏi localStorage và gọi callback onError (nếu có)
-	if (now >= decodedRefreshToken.exp) {
-		removeTokensFromLocalStorage();
-		if (params?.onError) return params.onError();
-	}
+  // Nếu refresh token đã hết hạn, xóa token khỏi localStorage và gọi callback onError (nếu có)
+  if (now >= decodedRefreshToken.exp) {
+    removeTokensFromLocalStorage();
+    if (params?.onError) return params.onError();
+  }
 
-	// Kiểm tra thời gian còn lại của access token:
-	// Nếu thời gian còn lại của access token nhỏ hơn 1/3 tổng thời gian hiệu lực của nó,
-	// thì gọi API refresh token để lấy cặp token mới.
-	if (
-		params?.force ||
-		decodedAccessToken.exp - now <
-			(decodedAccessToken.exp - decodedAccessToken.iat) / 3
-	) {
-		try {
-			const role = decodedRefreshToken.role;
-			// Gọi API refresh token sử dụng authApiRequest hoặc guestApiRequest tùy theo role
-			const response =
-				role === Role.Guest
-					? await guestApiRequest.cRefreshToken()
-					: await authApiRequest.cRefreshToken();
-			// Cập nhật access token và refresh token mới vào localStorage
-			setAccessTokenToLocalStorage(response.payload.data.accessToken);
-			setRefreshTokenToLocalStorage(response.payload.data.refreshToken);
-			// Gọi callback onSuccess nếu có
-			if (params?.onSuccess) params.onSuccess();
-		} catch (error) {
-			// Nếu có lỗi khi gọi API refresh token, gọi callback onError nếu có
-			if (params?.onError) params.onError();
-		}
-	}
+  // Kiểm tra thời gian còn lại của access token:
+  // Nếu thời gian còn lại của access token nhỏ hơn 1/3 tổng thời gian hiệu lực của nó,
+  // thì gọi API refresh token để lấy cặp token mới.
+  if (
+    params?.force ||
+    decodedAccessToken.exp - now <
+      (decodedAccessToken.exp - decodedAccessToken.iat) / 3
+  ) {
+    try {
+      const role = decodedRefreshToken.role;
+      // Gọi API refresh token sử dụng authApiRequest hoặc guestApiRequest tùy theo role
+      const response =
+        role === Role.Guest
+          ? await guestApiRequest.cRefreshToken()
+          : await authApiRequest.cRefreshToken();
+      // Cập nhật access token và refresh token mới vào localStorage
+      setAccessTokenToLocalStorage(response.payload.data.accessToken);
+      setRefreshTokenToLocalStorage(response.payload.data.refreshToken);
+      // Gọi callback onSuccess nếu có
+      if (params?.onSuccess) params.onSuccess();
+    } catch (error) {
+      // Nếu có lỗi khi gọi API refresh token, gọi callback onError nếu có
+      if (params?.onError) params.onError();
+    }
+  }
 };
 
 /**
@@ -205,10 +206,10 @@ export const checkAndRefreshToken = async (params?: {
  * @returns Chuỗi số đã được định dạng theo tiền tệ Việt Nam.
  */
 export const formatCurrency = (number: number) => {
-	return new Intl.NumberFormat("vi-VN", {
-		style: "currency",
-		currency: "VND",
-	}).format(number);
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(number);
 };
 
 /**
@@ -220,16 +221,16 @@ export const formatCurrency = (number: number) => {
  * @status: (typeof DishStatus)[keyof typeof DishStatus]: lấy tất cả các giá trị (values) tương ứng với các khóa của đối tượng hoặc enum (có nghĩa là status có thể nhận bất kỳ giá trị nào từ DishStatus)
  */
 export const getVietnameseDishStatus = (
-	status: (typeof DishStatus)[keyof typeof DishStatus]
+  status: (typeof DishStatus)[keyof typeof DishStatus]
 ) => {
-	switch (status) {
-		case DishStatus.Available:
-			return "Có sẵn";
-		case DishStatus.Unavailable:
-			return "Không có sẵn";
-		default:
-			return "Ẩn";
-	}
+  switch (status) {
+    case DishStatus.Available:
+      return "Có sẵn";
+    case DishStatus.Unavailable:
+      return "Không có sẵn";
+    default:
+      return "Ẩn";
+  }
 };
 
 /**
@@ -240,20 +241,20 @@ export const getVietnameseDishStatus = (
  * @returns Chuỗi trạng thái đơn hàng bằng tiếng Việt.
  */
 export const getVietnameseOrderStatus = (
-	status: (typeof OrderStatus)[keyof typeof OrderStatus]
+  status: (typeof OrderStatus)[keyof typeof OrderStatus]
 ) => {
-	switch (status) {
-		case OrderStatus.Delivered:
-			return "Đã phục vụ";
-		case OrderStatus.Paid:
-			return "Đã thanh toán";
-		case OrderStatus.Pending:
-			return "Chờ xử lý";
-		case OrderStatus.Processing:
-			return "Đang nấu";
-		default:
-			return "Từ chối";
-	}
+  switch (status) {
+    case OrderStatus.Delivered:
+      return "Đã phục vụ";
+    case OrderStatus.Paid:
+      return "Đã thanh toán";
+    case OrderStatus.Pending:
+      return "Chờ xử lý";
+    case OrderStatus.Processing:
+      return "Đang nấu";
+    default:
+      return "Từ chối";
+  }
 };
 
 /**
@@ -264,16 +265,16 @@ export const getVietnameseOrderStatus = (
  * @returns Chuỗi trạng thái bàn ăn bằng tiếng Việt.
  */
 export const getVietnameseTableStatus = (
-	status: (typeof TableStatus)[keyof typeof TableStatus]
+  status: (typeof TableStatus)[keyof typeof TableStatus]
 ) => {
-	switch (status) {
-		case TableStatus.Available:
-			return "Có sẵn";
-		case TableStatus.Reserved:
-			return "Đã đặt";
-		default:
-			return "Ẩn";
-	}
+  switch (status) {
+    case TableStatus.Available:
+      return "Có sẵn";
+    case TableStatus.Reserved:
+      return "Đã đặt";
+    default:
+      return "Ẩn";
+  }
 };
 
 /**
@@ -285,76 +286,84 @@ export const getVietnameseTableStatus = (
  * @returns Một URL hoàn chỉnh để truy cập thông tin bàn.
  */
 export const getTableLink = ({
-	token,
-	tableNumber,
+  token,
+  tableNumber,
 }: {
-	token: string;
-	tableNumber: number;
+  token: string;
+  tableNumber: number;
 }) => {
-	return (
-		envConfig.NEXT_PUBLIC_API_URL + "/tables/" + tableNumber + "?token=" + token
-	);
+  return (
+    envConfig.NEXT_PUBLIC_API_URL + "/tables/" + tableNumber + "?token=" + token
+  );
 };
 
 export const decodeToken = (token: string) => {
-	return jwt.decode(token) as TokenPayload;
+  return jwt.decode(token) as TokenPayload;
 };
 
 // chuyển tiếng Việt có dấu thành không dấu
 export function removeAccents(str: string) {
-	return str
-		.normalize("NFD")
-		.replace(/[\u0300-\u036f]/g, "")
-		.replace(/đ/g, "d")
-		.replace(/Đ/g, "D");
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D");
 }
 
 // Kiểm tra đoạn mathText có tồn tại trong fullText không:
 // ví dụ fullText = "Nguyễn Văn A", matchText = "nguyen van a" => true
 // dùng để search trong table
 export const simpleMatchText = (fullText: string, matchText: string) => {
-	return removeAccents(fullText.toLowerCase()).includes(
-		removeAccents(matchText.trim().toLowerCase())
-	);
+  return removeAccents(fullText.toLowerCase()).includes(
+    removeAccents(matchText.trim().toLowerCase())
+  );
 };
 
 export const formatDateTimeToLocaleString = (date: string | Date) => {
-	return format(
-		date instanceof Date ? date : new Date(date),
-		"HH:mm:ss dd/MM/yyyy"
-	);
+  return format(
+    date instanceof Date ? date : new Date(date),
+    "HH:mm:ss dd/MM/yyyy"
+  );
 };
 
 export const formatDateTimeToTimeString = (date: string | Date) => {
-	return format(date instanceof Date ? date : new Date(date), "HH:mm:ss");
+  return format(date instanceof Date ? date : new Date(date), "HH:mm:ss");
 };
 
 export const generateSocketInstance = (accessToken: string) => {
-	return io(envConfig.NEXT_PUBLIC_API_ENDPOINT, {
-		auth: {
-			Authorization: `Bearer ${accessToken}`,
-		},
-	});
+  return io(envConfig.NEXT_PUBLIC_API_ENDPOINT, {
+    auth: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 };
 
 export const OrderStatusIcon = {
-	[OrderStatus.Pending]: Loader,
-	[OrderStatus.Processing]: CookingPot,
-	[OrderStatus.Rejected]: BookX,
-	[OrderStatus.Delivered]: Truck,
-	[OrderStatus.Paid]: HandCoins,
+  [OrderStatus.Pending]: Loader,
+  [OrderStatus.Processing]: CookingPot,
+  [OrderStatus.Rejected]: BookX,
+  [OrderStatus.Delivered]: Truck,
+  [OrderStatus.Paid]: HandCoins,
 };
 
 // sử dụng generic type để khi ta truyền vào hàm có kiểu trả về nào thì hàm sẽ trả về kiểu đó
 export const wrapServerApi = async <T>(fn: () => Promise<T>) => {
-	let result = null;
-	try {
-		result = await fn();
-	} catch (error: any) {
-		if (error.digest?.includes("NEXT_REDIRECT")) {
-			throw error;
-		}
-	} finally {
-		return result;
-	}
+  let result = null;
+  try {
+    result = await fn();
+  } catch (error: any) {
+    if (error.digest?.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
+  } finally {
+    return result;
+  }
+};
+
+export const generateSlugUrl = ({ name, id }: { name: string; id: number }) => {
+  return `${slugify(name)}-i.${id}`;
+};
+
+export const getIdFromSlugUrl = (slug: string) => {
+  return Number(slug.split("-i.")[1]);
 };

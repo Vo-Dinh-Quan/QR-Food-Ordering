@@ -1,7 +1,7 @@
 import dishApiRequest from "@/apiRequests/dish";
-import Modal from "@/app/(public)/@modal/(.)dishes/[id]/modal";
-import DishDetail from "@/app/(public)/dishes/[id]/dish-detail";
-import { wrapServerApi } from "@/lib/utils";
+import Modal from "@/app/(public)/@modal/(.)dishes/[slug]/modal";
+import DishDetail from "@/app/(public)/dishes/[slug]/dish-detail";
+import { getIdFromSlugUrl, wrapServerApi } from "@/lib/utils";
 import { SquareChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,10 +9,10 @@ import Link from "next/link";
 export default async function DishPage({
   params: paramsPromise,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
   const params = await paramsPromise;
-  const { id } = params;
+  const id = getIdFromSlugUrl(params.slug);
   const data = await wrapServerApi(() => dishApiRequest.getDish(Number(id)));
   const dish = data?.payload?.data;
 
