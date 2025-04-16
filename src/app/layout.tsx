@@ -6,6 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import AppProvider from "@/components/app-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { baseOpenGraph } from "@/app/shared-metadata";
+import Footer from "@/components/footer";
+import NextTopLoader from "nextjs-toploader";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -85,6 +87,10 @@ export default function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}>
+        <NextTopLoader
+          showSpinner={false}
+          color="hsl(var(--muted-foreground))"
+        />
         <AppProvider>
           {/*ThemeProvider của dark mode */}
           <ThemeProvider
@@ -93,6 +99,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange>
             {children}
+            <Footer />
             <Toaster />
           </ThemeProvider>
         </AppProvider>
