@@ -1,0 +1,52 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: 'npm'
+      
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_PRODUCTION }}" > .env
+
+      - name: Install dependencies
+        run: npm install --force
+
+      - name: Build the project
+        run: npm run build
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST_PRODUCTION }}
+          username: ${{ secrets.USERNAME_PRODUCTION }}
+          password: ${{ secrets.PASSWORD_PRODUCTION }}
+          port: 22
+          script: |
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
+            nvm use 22.14.0
+            cd ~/QR-Food-Ordering
+            git fetch --all
+            git reset --hard origin/main
+            echo "${{ secrets.ENV_PRODUCTION }}" > .env
+            npm install --force
+            npm run build
+            pm2 restart next-app

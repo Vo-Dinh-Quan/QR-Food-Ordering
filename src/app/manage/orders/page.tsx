@@ -24,6 +24,7 @@ export default function AccountsPage() {
             <Suspense>
               <div className="min-w-0 overflow-x-auto">
                 <OrderTable />
+                {/* <OrderTableSkeleton /> */}
               </div>
             </Suspense>
           </CardContent>

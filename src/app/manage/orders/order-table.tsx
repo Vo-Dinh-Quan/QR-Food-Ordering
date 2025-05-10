@@ -437,7 +437,7 @@ export default function OrderTable() {
                           onSelect={(currentValue) => {
                             // Cập nhật filter trạng thái: nếu trạng thái được chọn trùng với giá trị hiện tại thì reset filter
                             table
-                              .getColumn("status")
+                              .getColumn("status")  
                               ?.setFilterValue(
                                 currentValue ===
                                   table.getColumn("status")?.getFilterValue()
